@@ -1,0 +1,519 @@
+{
+  "total": 459,
+  "before": 153,
+  "after": 133,
+  "resolved": 20,
+  "examples": [
+    {
+      "username": "fidanegitimi",
+      "category": "Bahçe & bitkiler",
+      "alternatives": [],
+      "country": "TR",
+      "account_type": "unknown",
+      "evidence": [
+        {
+          "category": "Bahçe & bitkiler",
+          "keyword": "bitki",
+          "field": "biography",
+          "weight": 3,
+          "excerpt": "fidan asi ve dogaya dair bilmediklerin bitki yetistirmenin yeni nesil yolu takip et ogrenmeye basla"
+        },
+        {
+          "category": "Bahçe & bitkiler",
+          "keyword": "yetistirmenin",
+          "field": "biography",
+          "weight": 3,
+          "excerpt": "fidan asi ve dogaya dair bilmediklerin bitki yetistirmenin yeni nesil yolu takip et ogrenmeye basla"
+        }
+      ]
+    },
+    {
+      "username": "saklibahcebitkileri",
+      "category": "Bahçe & bitkiler",
+      "alternatives": [],
+      "country": null,
+      "account_type": "store",
+      "evidence": [
+        {
+          "category": "Bahçe & bitkiler",
+          "keyword": "bitkiler",
+          "field": "biography",
+          "weight": 3,
+          "excerpt": "erzincan merkez kaktus sukulent cicekli bitkiler s"
+        },
+        {
+          "category": "Bahçe & bitkiler",
+          "keyword": "bahce",
+          "field": "display_name",
+          "weight": 3,
+          "excerpt": "sakli bahce bitkileri"
+        }
+      ]
+    },
+    {
+      "username": "succulentsakademi",
+      "category": "Bahçe & bitkiler",
+      "alternatives": [],
+      "country": null,
+      "account_type": "unknown",
+      "evidence": [
+        {
+          "category": "Bahçe & bitkiler",
+          "keyword": "garden",
+          "field": "biography",
+          "weight": 3,
+          "excerpt": "succulent cactus plants garden box"
+        },
+        {
+          "category": "Bahçe & bitkiler",
+          "keyword": "plants",
+          "field": "biography",
+          "weight": 3,
+          "excerpt": "succulent cactus plants garden box"
+        }
+      ]
+    },
+    {
+      "username": "hobibahcem_yt",
+      "category": "Bahçe & bitkiler",
+      "alternatives": [],
+      "country": "TR",
+      "account_type": "unknown",
+      "evidence": [
+        {
+          "category": "Bahçe & bitkiler",
+          "keyword": "bahcem",
+          "field": "display_name",
+          "weight": 3,
+          "excerpt": "hobi bahcem"
+        },
+        {
+          "category": "Bahçe & bitkiler",
+          "keyword": "sebzeler",
+          "field": "post_caption",
+          "weight": 3,
+          "excerpt": " bilmesini istedigin kisiye gonder gunes sevmeyen golgede daha saglikli yetiseb sebzeler bahce dogal fide bahce dogal fide",
+          "source_url": "https://www.instagram.com/p/DXm0s7dDesZ/"
+        },
+        {
+          "category": "Bahçe & bitkiler",
+          "keyword": "yetiseb",
+          "field": "post_caption",
+          "weight": 3,
+          "excerpt": "27w bilmesini istedigin kisiye gonder gunes sevmeyen golgede daha saglikli yetiseb sebzeler bahce dogal fide bahce dogal fide",
+          "source_url": "https://www.instagram.com/p/DXm0s7dDesZ/"
+        }
+      ]
+    },
+    {
+      "username": "_eylulbolat",
+      "category": "Temizlik & düzen",
+      "alternatives": [],
+      "country": null,
+      "account_type": "unknown",
+      "evidence": [
+        {
+          "category": "Temizlik & düzen",
+          "keyword": "duzeni",
+          "field": "post_caption",
+          "weight": 3,
+          "excerpt": "46w bir sonraki videoda bol bol kalem duzeni olacak reklam yoktur odaduzeni odadekorasyonu dekarasyononerileri ikea evdekorasyonfikirleri odaduzeni odadekorasyonu dekarasyononerileri ikea evdekorasyonfikirleri",
+          "source_url": "https://www.instagram.com/p/DScrmqkCIEt/"
+        },
+        {
+          "category": "Temizlik & düzen",
+          "keyword": "kalem",
+          "field": "post_caption",
+          "weight": 3,
+          "excerpt": "46w bir sonraki videoda bol bol kalem duzeni olacak reklam yoktur odaduzeni odadekorasyonu dekarasyononerileri ikea evdekorasyonfikirleri odaduzeni odadekorasyonu dekarasyononerileri ikea evdekorasyonfikirleri",
+          "source_url": "https://www.instagram.com/p/DScrmqkCIEt/"
+        }
+      ]
+    },
+    {
+      "username": "sanatvanconcept",
+      "category": "Interior Design",
+      "alternatives": [],
+      "country": "TR",
+      "account_type": "unknown",
+      "evidence": [
+        {
+          "category": "Interior Design",
+          "keyword": "tasarim",
+          "field": "biography",
+          "weight": 3,
+          "excerpt": "mutfak banyo dolabi portmanto kisiye mekana gore ozel tasarim since 2007 detayli bilgi ve iletisim"
+        },
+        {
+          "category": "Interior Design",
+          "keyword": "yatak",
+          "field": "post_caption",
+          "weight": 3,
+          "excerpt": "23w yatak odasi projemiz dar alanlar icin odanizda daha fazla yer kazanmak icin sizlerde yataginizi dolaba gomme yapabilirsiniz yatakodasimodelleri yatakodasidekorasyonu yatakodasi yatakodasimodelleri yatakodasidekorasyonu y",
+          "source_url": "https://www.instagram.com/p/DYxxEhkAoCb/"
+        }
+      ]
+    },
+    {
+      "username": "aleynauslu61",
+      "category": "Interior Design",
+      "alternatives": [],
+      "country": "TR",
+      "account_type": "unknown",
+      "evidence": [
+        {
+          "category": "Interior Design",
+          "keyword": "odam",
+          "field": "post_caption",
+          "weight": 3,
+          "excerpt": "107w evett o cok beklenen video sonunda geldii odam kucuk oldugu icin bu sekilde tasarim sectik kocambeyin ellerine saglik sade sik ve kullanisli bi tasarim oldu yatak kenarlarina priz ve aydinlatici ekledik bu cok isimize yaradi yatak basligini ye baza kenarlarini a",
+          "source_url": "https://www.instagram.com/p/DBUCy9oqev0/"
+        },
+        {
+          "category": "Interior Design",
+          "keyword": "tasarim",
+          "field": "post_caption",
+          "weight": 3,
+          "excerpt": "07w evett o cok beklenen video sonunda geldii odam kucuk oldugu icin bu sekilde tasarim sectik kocambeyin ellerine saglik sade sik ve kullanisli bi tasarim oldu yatak kenarlarina priz ve aydinlatici ekledik bu cok isimize yaradi yatak basligini ye baza kenarlarini ayni model yaptirdim benim gibi oda",
+          "source_url": "https://www.instagram.com/p/DBUCy9oqev0/"
+        }
+      ]
+    },
+    {
+      "username": "aimeexooxo1",
+      "category": "Makyaj",
+      "alternatives": [],
+      "country": null,
+      "account_type": "unknown",
+      "evidence": [
+        {
+          "category": "Makyaj",
+          "keyword": "make up",
+          "field": "biography",
+          "weight": 3,
+          "excerpt": " aimeexooxo 350k dm or email for collab pr email aimee 100h gmail com self care make up hauls"
+        },
+        {
+          "category": "Makyaj",
+          "keyword": "hauls",
+          "field": "biography",
+          "weight": 3,
+          "excerpt": "oxo 350k dm or email for collab pr email aimee 100h gmail com self care make up hauls"
+        }
+      ]
+    },
+    {
+      "username": "alisveris",
+      "category": "Interior Design",
+      "alternatives": [],
+      "country": "TR",
+      "account_type": "unknown",
+      "evidence": [
+        {
+          "category": "Interior Design",
+          "keyword": "odaniz",
+          "field": "post_caption",
+          "weight": 3,
+          "excerpt": "27w duvarlar aradan kalkiyor odaniz artik bir gozlemevi dort duvar arasina sikisip kalmaktan sikilanlar buraya bu akilli galaksi projektoru odanizin tavanini ve duvarlarini canli nebulalarla parildayan yildizlarla dolduruyor sanki acik havada ucsuz ",
+          "source_url": "https://www.instagram.com/p/DXqv1JVjIrW/"
+        },
+        {
+          "category": "Interior Design",
+          "keyword": "dekorasyonfikirleri",
+          "field": "post_caption",
+          "weight": 3,
+          "excerpt": "i hissediyorum elon musk gorse kiskanir odadekorasyonu gecelambasi uzay galaksi dekorasyonfikirleri odadekorasyonu gecelambasi uzay galaksi dekorasyonfikirleri",
+          "source_url": "https://www.instagram.com/p/DXqv1JVjIrW/"
+        },
+        {
+          "category": "Interior Design",
+          "keyword": "duvarlar",
+          "field": "post_caption",
+          "weight": 3,
+          "excerpt": "27w duvarlar aradan kalkiyor odaniz artik bir gozlemevi dort duvar arasina sikisip kalmaktan sikilanlar buraya bu akilli galaksi projektoru odanizin tavanini ve duvarlarini canli nebulalarla parildayan yildizlarla dolduruyor",
+          "source_url": "https://www.instagram.com/p/DXqv1JVjIrW/"
+        }
+      ]
+    },
+    {
+      "username": "oklumi.tr",
+      "category": "Interior Design",
+      "alternatives": [],
+      "country": "TR",
+      "account_type": "store",
+      "evidence": [
+        {
+          "category": "Interior Design",
+          "keyword": "tasarlandi",
+          "field": "biography",
+          "weight": 3,
+          "excerpt": "daha iyi geceler icin tasarlandi ucretsiz kargo guvenli alisveris hemen satin al"
+        },
+        {
+          "category": "Interior Design",
+          "keyword": "odanizi",
+          "field": "post_caption",
+          "weight": 3,
+          "excerpt": "12w bunu uyku problemi ceken o arkadasina sakin gosterme tek bir tusla odanizi devasa bir ay ve yildizli gokyuzune donusturun ister film izlerken sinema keyfinizi ikiye katlayin ister uyku oncesi gunun tum stresini atip huzurla uykuya dalin degistirilebilir mini lens secenekleri uzaktan kum",
+          "source_url": "https://www.instagram.com/p/DcBwKm3uwYc/"
+        }
+      ]
+    },
+    {
+      "username": "hrtqv",
+      "category": "Gaming",
+      "alternatives": [],
+      "country": null,
+      "account_type": "creator",
+      "evidence": [
+        {
+          "category": "Gaming",
+          "keyword": "fivem",
+          "field": "biography",
+          "weight": 3,
+          "excerpt": "fivem content creator link to my graphics"
+        },
+        {
+          "category": "Gaming",
+          "keyword": "graphics",
+          "field": "post_caption",
+          "weight": 3,
+          "excerpt": "98w link to my graphics in bio what car next viral fyp fry gta drift fivem driftzone viral fyp fry gta drift fivem driftzone",
+          "source_url": "https://www.instagram.com/p/DDnVsibIzTa/"
+        }
+      ]
+    },
+    {
+      "username": "neuneon.co",
+      "category": "Interior Design",
+      "alternatives": [],
+      "country": "TR",
+      "account_type": "store",
+      "evidence": [
+        {
+          "category": "Interior Design",
+          "keyword": "odanin",
+          "field": "post_caption",
+          "weight": 3,
+          "excerpt": "84w odanin havasini tek dokunusla degistir metre led ile siradan bir duvari sanat eserine donusturmek mumkun rengini sec tarzini yansit kendine ozel bir kose yarat calisma alanin yatak basin ya da aynanin etrafi her yere uyu",
+          "source_url": "https://www.instagram.com/p/DHvnG3iKqEU/"
+        },
+        {
+          "category": "Interior Design",
+          "keyword": "dekorasyononerileri",
+          "field": "post_caption",
+          "weight": 3,
+          "excerpt": "a odadekorasyonu aydinlatmatasarimi isiklidekorasyon kisiyeozelhediye renkarenk dekorasyononerileri neonsign neontabela ledisik ledtabela odadekorasyonu aydinlatmatasarimi isiklidekorasyon kisiyeozelhediye renkarenk dekorasyononerileri neonsign",
+          "source_url": "https://www.instagram.com/p/DHvnG3iKqEU/"
+        },
+        {
+          "category": "Interior Design",
+          "keyword": "duvari",
+          "field": "post_caption",
+          "weight": 3,
+          "excerpt": "84w odanin havasini tek dokunusla degistir metre led ile siradan bir duvari sanat eserine donusturmek mumkun rengini sec tarzini yansit kendine ozel bir kose yarat calisma alanin yatak basin ya da aynanin etrafi her yere uyum saglar her alani bambaska bir dunyaya cevirir kolay montaj gucl",
+          "source_url": "https://www.instagram.com/p/DHvnG3iKqEU/"
+        }
+      ]
+    },
+    {
+      "username": "cerennazersoy",
+      "category": "Interior Design",
+      "alternatives": [],
+      "country": null,
+      "account_type": "unknown",
+      "evidence": [
+        {
+          "category": "Interior Design",
+          "keyword": "design",
+          "field": "biography",
+          "weight": 3,
+          "excerpt": "collab roydtalent com yeditepe university graphic design"
+        },
+        {
+          "category": "Interior Design",
+          "keyword": "odaduzeni",
+          "field": "post_caption",
+          "weight": 3,
+          "excerpt": "24w takip etmeyi unutmayin reklamyok urunleri kendim satin aldim odaduzeni odaduzenleme odayenileme odadekorasyonu reklamyok odaduzeni odaduzenleme odayenileme odadekorasyonu",
+          "source_url": "https://www.instagram.com/p/DYmfNKiscuR/"
+        }
+      ]
+    },
+    {
+      "username": "sevo_ozeltasarimatolyesi",
+      "category": "Interior Design",
+      "alternatives": [],
+      "country": "TR",
+      "account_type": "store",
+      "evidence": [
+        {
+          "category": "Interior Design",
+          "keyword": "tasarimlar",
+          "field": "biography",
+          "weight": 3,
+          "excerpt": "el yapimi ozgun tasarimlar canta supla kapi duvar susleri kisiye ozel siparis alinir siparis ve bilgi icin dm"
+        },
+        {
+          "category": "Interior Design",
+          "keyword": "duvar",
+          "field": "biography",
+          "weight": 3,
+          "excerpt": "el yapimi ozgun tasarimlar canta supla kapi duvar susleri kisiye ozel siparis alinir siparis ve bilgi icin dm"
+        }
+      ]
+    },
+    {
+      "username": "bloggg_beyza",
+      "category": "Temizlik & düzen",
+      "alternatives": [],
+      "country": null,
+      "account_type": "unknown",
+      "evidence": [
+        {
+          "category": "Temizlik & düzen",
+          "keyword": "kalem",
+          "field": "display_name",
+          "weight": 3,
+          "excerpt": "beyza s stationery world kalem sever bir kiz"
+        },
+        {
+          "category": "Temizlik & düzen",
+          "keyword": "duzenim",
+          "field": "post_caption",
+          "weight": 3,
+          "excerpt": "41w kisa bir masa duzenim olsun masam da kullandigim tum urunlere hikayemden ve one cikanlardan ulasabilirsiniz reklam stationery kalem pencil masaduzeni reklam stationery kalem pencil masaduzeni",
+          "source_url": "https://www.instagram.com/p/DTujF6QjdfS/"
+        }
+      ]
+    },
+    {
+      "username": "ayluna.co",
+      "category": "Interior Design",
+      "alternatives": [],
+      "country": "TR",
+      "account_type": "unknown",
+      "evidence": [
+        {
+          "category": "Interior Design",
+          "keyword": "odasi",
+          "field": "post_caption",
+          "weight": 3,
+          "excerpt": "11w bebek ve cocuk odasi dekorasyonuna sihirli bir dokunus ekleyin gunduzleri sik ve sevimli atlikarinca tasarimiyla odanin havasini degistiren ayluna lunadream gece lambasi geceleri ise duvarlari kaplayan masalsi projeksiyonuyla buyulu bi",
+          "source_url": "https://www.instagram.com/p/DcRgnfzvLi_/"
+        },
+        {
+          "category": "Interior Design",
+          "keyword": "dekorasyonuna",
+          "field": "post_caption",
+          "weight": 3,
+          "excerpt": "11w bebek ve cocuk odasi dekorasyonuna sihirli bir dokunus ekleyin gunduzleri sik ve sevimli atlikarinca tasarimiyla odanin havasini degistiren ayluna lunadream gece lambasi geceleri ise duvarlari kaplayan masalsi projeksiyonuyla buyulu bir atmo",
+          "source_url": "https://www.instagram.com/p/DcRgnfzvLi_/"
+        },
+        {
+          "category": "Interior Design",
+          "keyword": "duvarlari",
+          "field": "post_caption",
+          "weight": 3,
+          "excerpt": "sarimiyla odanin havasini degistiren ayluna lunadream gece lambasi geceleri ise duvarlari kaplayan masalsi projeksiyonuyla buyulu bir atmosfer yaratiyor estetik ve fonksiyonel tasarim odanin her kosesine yayilan dinlendirici isik oyunlari odanizin en tatli detayini kesfetmek icin profildeki baglanti",
+          "source_url": "https://www.instagram.com/p/DcRgnfzvLi_/"
+        }
+      ]
+    },
+    {
+      "username": "greyart.works",
+      "category": "Interior Design",
+      "alternatives": [],
+      "country": "TR",
+      "account_type": "unknown",
+      "evidence": [
+        {
+          "category": "Interior Design",
+          "keyword": "tasarim",
+          "field": "biography",
+          "weight": 3,
+          "excerpt": "stone surfaces furniture art tas ozel yuzey uygulamalari ozel tasarim mobilya aksesuar dokulu ve 3d yuzey tasarimi ic"
+        },
+        {
+          "category": "Interior Design",
+          "keyword": "furniture",
+          "field": "biography",
+          "weight": 3,
+          "excerpt": "stone surfaces furniture art tas ozel yuzey uygulamalari ozel tasarim mobilya aksesuar dokulu ve 3d yuzey tasarimi ic"
+        }
+      ]
+    },
+    {
+      "username": "soloshome",
+      "category": "Interior Design",
+      "alternatives": [],
+      "country": "TR",
+      "account_type": "store",
+      "evidence": [
+        {
+          "category": "Interior Design",
+          "keyword": "tasarim",
+          "field": "biography",
+          "weight": 3,
+          "excerpt": "1 000 tasarim dekoratif tablolar uretici firma 0545 338 61 54 ucretsiz kargo taksit secenegi urunler icin"
+        },
+        {
+          "category": "Interior Design",
+          "keyword": "wall",
+          "field": "display_name",
+          "weight": 3,
+          "excerpt": "solos wall art ozenle hazirlanmis tablolar"
+        }
+      ]
+    },
+    {
+      "username": "alonewlrd0",
+      "category": "Temizlik & düzen",
+      "alternatives": [],
+      "country": null,
+      "account_type": "unknown",
+      "evidence": [
+        {
+          "category": "Temizlik & düzen",
+          "keyword": "clean",
+          "field": "post_caption",
+          "weight": 3,
+          "excerpt": "35w a clean bedroom that smells good roomdecorideas smallroomdecor bedroomdecoration bedroomstyle bedroomdecorideas roomdecorideas smallroomdecor bedroomdecoration bedroomstyle bedroomdecorideas",
+          "source_url": "https://www.instagram.com/p/DVeefWXkq2Q/"
+        },
+        {
+          "category": "Temizlik & düzen",
+          "keyword": "roomdecorideas",
+          "field": "post_caption",
+          "weight": 3,
+          "excerpt": "35w a clean bedroom that smells good roomdecorideas smallroomdecor bedroomdecoration bedroomstyle bedroomdecorideas roomdecorideas smallroomdecor bedroomdecoration bedroomstyle bedroomdecorideas",
+          "source_url": "https://www.instagram.com/p/DVeefWXkq2Q/"
+        }
+      ]
+    },
+    {
+      "username": "mirage.iq",
+      "category": "Interior Design",
+      "alternatives": [],
+      "country": null,
+      "account_type": "unknown",
+      "evidence": [
+        {
+          "category": "Interior Design",
+          "keyword": "design",
+          "field": "biography",
+          "weight": 3,
+          "excerpt": "mirage where design becomes art"
+        },
+        {
+          "category": "Interior Design",
+          "keyword": "room",
+          "field": "post_caption",
+          "weight": 3,
+          "excerpt": "11w vibe spotify ms paint make your room look different",
+          "source_url": "https://www.instagram.com/p/DcGl_OQjnsl/"
+        }
+      ]
+    }
+  ]
+}

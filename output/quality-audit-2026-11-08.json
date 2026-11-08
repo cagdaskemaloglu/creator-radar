@@ -1,0 +1,189 @@
+{
+  "summary": {
+    "profiles": 156,
+    "category_before": 16,
+    "category_after": 17,
+    "qualified_before": 0,
+    "qualified_after": 1,
+    "country_before": 86,
+    "country_after": 86
+  },
+  "examples": [
+    {
+      "username": "interiorby.giulia",
+      "category_before": "different",
+      "category_after": "unknown",
+      "country_before": null,
+      "country_after": null,
+      "overall": "unknown"
+    },
+    {
+      "username": "icmimarsibelarslan",
+      "category_before": "unknown",
+      "category_after": "different",
+      "country_before": "TR",
+      "country_after": "TR",
+      "overall": "different"
+    },
+    {
+      "username": "icmimaralican",
+      "category_before": "unknown",
+      "category_after": "different",
+      "country_before": null,
+      "country_after": null,
+      "overall": "different"
+    },
+    {
+      "username": "icmimar.bugra",
+      "category_before": "unknown",
+      "category_after": "different",
+      "country_before": "TR",
+      "country_after": "TR",
+      "overall": "different"
+    },
+    {
+      "username": "aktuelci.abla",
+      "category_before": "unknown",
+      "category_after": "different",
+      "country_before": "TR",
+      "country_after": "TR",
+      "overall": "different"
+    },
+    {
+      "username": "pratikk.fikirler",
+      "category_before": "unknown",
+      "category_after": "different",
+      "country_before": "TR",
+      "country_after": "TR",
+      "overall": "different"
+    },
+    {
+      "username": "ahsap_gemisi",
+      "category_before": "unknown",
+      "category_after": "different",
+      "country_before": "TR",
+      "country_after": "TR",
+      "overall": "different"
+    },
+    {
+      "username": "ahsapsanatevimiz",
+      "category_before": "unknown",
+      "category_after": "different",
+      "country_before": "TR",
+      "country_after": "TR",
+      "overall": "different"
+    },
+    {
+      "username": "mimarinsepeti",
+      "category_before": "different",
+      "category_after": "matched",
+      "country_before": "TR",
+      "country_after": "TR",
+      "overall": "estimated"
+    },
+    {
+      "username": "icmimargozundenmekanlar",
+      "category_before": "unknown",
+      "category_after": "different",
+      "country_before": "TR",
+      "country_after": "TR",
+      "overall": "different"
+    },
+    {
+      "username": "aysegull.ayydnn",
+      "category_before": "unknown",
+      "category_after": "different",
+      "country_before": "TR",
+      "country_after": "TR",
+      "overall": "different"
+    },
+    {
+      "username": "ev_yenileme_tadilat_gunlugu",
+      "category_before": "unknown",
+      "category_after": "different",
+      "country_before": "TR",
+      "country_after": "TR",
+      "overall": "different"
+    },
+    {
+      "username": "interior.digest",
+      "category_before": "different",
+      "category_after": "unknown",
+      "country_before": null,
+      "country_after": null,
+      "overall": "unknown"
+    },
+    {
+      "username": "pozitivemobilya",
+      "category_before": "unknown",
+      "category_after": "different",
+      "country_before": "TR",
+      "country_after": "TR",
+      "overall": "different"
+    },
+    {
+      "username": "byomermasmas",
+      "category_before": "unknown",
+      "category_after": "different",
+      "country_before": "TR",
+      "country_after": "TR",
+      "overall": "different"
+    },
+    {
+      "username": "rozayapimimarlik",
+      "category_before": "unknown",
+      "category_after": "different",
+      "country_before": "TR",
+      "country_after": "TR",
+      "overall": "different"
+    },
+    {
+      "username": "erturk.mobilya",
+      "category_before": "unknown",
+      "category_after": "different",
+      "country_before": null,
+      "country_after": null,
+      "overall": "different"
+    },
+    {
+      "username": "alperenerbay",
+      "category_before": "unknown",
+      "category_after": "different",
+      "country_before": "TR",
+      "country_after": "TR",
+      "overall": "different"
+    },
+    {
+      "username": "avilamobilya",
+      "category_before": "unknown",
+      "category_after": "different",
+      "country_before": "TR",
+      "country_after": "TR",
+      "overall": "different"
+    },
+    {
+      "username": "samscottbills",
+      "category_before": "different",
+      "category_after": "unknown",
+      "country_before": null,
+      "country_after": null,
+      "overall": "unknown"
+    },
+    {
+      "username": "30secondscreation",
+      "category_before": "different",
+      "category_after": "unknown",
+      "country_before": null,
+      "country_after": null,
+      "overall": "unknown"
+    },
+    {
+      "username": "breannainbrooklyn",
+      "category_before": "different",
+      "category_after": "unknown",
+      "country_before": null,
+      "country_after": null,
+      "overall": "unknown"
+    }
+  ]
+}

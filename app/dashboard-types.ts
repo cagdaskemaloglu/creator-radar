@@ -1,0 +1,93 @@
+import type {KeywordPerformance} from '../lib/discovery-store';
+import type {ContactEmail} from '../lib/contact-emails';
+import {categoryTerms,countries} from '../lib/taxonomy';
+import type { ClassificationEvidence } from '../lib/model';
+export type Creator={selling_status?:string;sales_channels?:import('../lib/commerce').SalesChannel[];sales_evidence?:{kind:string;field:string;excerpt:string;source_url:string}[];promotion_signals?:boolean;uncertainty_reasons?:string[];coverage_gaps?:string[];review_assessment?:import('../lib/research-diagnostics').ReviewAssessment;research_topics?:string[];category_match?:string;research_match?:string;classification_warnings?:string[];country_match?:string;contact_emails?:ContactEmail[];country_estimate?:{language:string|null;country:string|null;candidates:string[];confidence:string;method:string;signals?:string[]};country?:string|null;city?:string|null;gender?:string|null;location_status?:string;language_hint?:string|null;target_match?:string;context_evidence?:{field:string;excerpt:string}[];id:number;username:string;display_name:string|null;biography:string|null;followers_count:number|null;primary_niche:string|null;categories?:string[];fit_score:number;explanation:string;validation_status:string;profile_url:string;updated_at:string;synthetic:boolean;account_type?:string;classification_evidence?:ClassificationEvidence[];extraction?:{warnings:string[];metric_labels:Record<string,string|null>};sources:{provider:string;source_identifier:string;collected_at:string}[];discovery_evidence?:{provider:string;keyword:string;search_url:string;result_url:string}[]};
+export const tagOutcomeLabels:Record<string,string>={tag_layout_unreadable:'Etiket yapısı okunamadı',tag_layout_unreadable_legacy:'Eski etiket okuma sorunu atlandı',tag_load_failed:'Etiket sayfası yüklenemedi',empty_results:'Etikette sonuç yok',tag_unavailable:'Etiket sayfası mevcut değil',curated_term_removed:'Geniş arama terimi yeni plandan çıkarıldı',learned_term_evidence_insufficient:'Öğrenilen terimin kategori veya ülke kanıtı artık yeterli değil'};
+export const ownerFailureLabels:Record<string,string>={owner_link_missing:'Sahip bağlantısı bulunamadı',multiple_owner_candidates:'Birden fazla sahip adayı var',post_identity_mismatch:'Gönderi kimliği eşleşmedi',page_not_loaded:'Sayfa yüklenmedi',unsupported_post_route:'Gönderi adresi desteklenmiyor'};
+export type ResearchRun={continuation?:{can_resume:boolean;can_carry:boolean;expired:boolean;expires_at:string;remaining_pages:number;pending:number;reason:string};allocation?:{enrichment_limit:number;enrichment_visits:number;enrichment_qualified?:number;discovery_visits:number};diagnostics?:{uncertainty:Record<string,number>;coverage:Record<string,number>;review:{with_telemetry:number;attempted:number;visits:number;resolved:number;became_qualified:number;budget_deferred:number;no_posts:number;evidence_unavailable:number;unsupported_routes:number}};frontier?:{total:number;untried:number;cooling:number;learned:number;withheld_learned?:number;untried_learned?:number;tried_learned?:number}|null;metrics?:{qualified_new_per_hour?:number;estimated_new_per_hour?:number;new_profiles_per_hour:number;recent_profiles_skipped:number;pages_per_record:number|null};job_id:number;status:string;page_requests:number;inserted:number;updated:number;matched:number;estimated?:number;categorized?:number;target_unknown?:number;target_different?:number;uncertain:number;skipped:number;pending:number;unresolved_posts:number;started_at:string;finished_at:string|null;stop_reason:string|null;settings:{target?:{country?:string;city?:string;gender?:string};efficientResearch?:boolean;maxProfiles:number;maxPages:number;hours:number;discovery?:{keywords?:string[]}};candidates:{id:number;url:string;status:string;category:string|null}[];discovery?:{queries:{keyword:string;status:string;result_count:number;error?:string|null}[];results:{source_url:string;status:string;profile_url:string|null;reason:string|null}[]}};
+export type LogEntry={id:number;job_id:number;message:string;created_at:string};
+export type DashboardData={continuousScan?:{enabled:boolean;status:string;message:string|null;cycle:number;job_id:number|null;next_at:string|null;config:Record<string,unknown>};evaluations?:{sample:number;correct:number;wrong:number;insufficient:number;accuracy:number|null;historical:number};improvements?:{pending:number};access?:{research_status?:string;http_restriction?:import('../lib/instagram-restriction').HttpRestriction|null;retry_not_before?:string|null;retry_seconds_remaining?:number;can_request_resume?:boolean;last_research_success_at?:string|null;paused:boolean;last_restriction_reason:string|null;last_restriction_at:string|null;last_checked_at:string|null;automatic_retry:boolean;required_action:string};tagPerformance?:KeywordPerformance[];creators:Creator[];jobs:{id:number;kind:string;status:string}[];nightRuns:ResearchRun[];researchLogs:LogEntry[];worker?:{running:boolean;seen_at:string|null};instagram?:{enabled:boolean;paused:boolean;reason:string|null;visits:number};limits?:{dailyPages:number|null;intervalMs:number;waitMinMs?:number;waitMaxMs?:number};defaults?:{pages:number;profiles:number;queries:number;results:number};researchBrowser?:{session:{status:string;checked_at:string|null}}};
+export const researchAccessLabels:Record<string,string>={waiting:'Sunucunun bildirdiği bekleme süresi devam ediyor',restricted:'Araştırma erişimi kısıtlı',not_rechecked:'Yerel durdurma kaldırıldı; araştırma erişimi henüz doğrulanmadı',last_page_ok:'Son araştırma sayfası açıldı; bu tüm sayfaların açık olduğunu garanti etmez',unverified:'Araştırma erişimi henüz ölçülmedi'};
+export const resourceTypeLabels:Record<string,string>={document:'Sayfa',xhr:'Veri isteği',fetch:'Veri isteği',image:'Görsel',script:'Betik',stylesheet:'Görünüm dosyası',font:'Yazı tipi',other:'Diğer kaynak'};
+export const researchMatchLabels:Record<string,string>={matched:'Hedefe uyuyor · açık kanıt',estimated:'Hedefe tahminen uyuyor · düşük güven',different:'Hedef dışında',unknown:'Hedef uyumu belirsiz',not_requested:'Hedef belirtilmedi'};
+export const categoryMatchLabels:Record<string,string>={matched:'İstenen kategoriye uyuyor',different:'İstenen kategori dışında',unknown:'Kategori belirsiz',not_requested:'Kategori hedefi belirtilmedi'};
+export const areas=Object.keys(categoryTerms);
+export const statusLabels:Record<string,string>={queued:'Sırada',running:'Araştırılıyor',completed:'Tamamlandı',paused:'Duraklatıldı',cancelled:'Durduruldu',failed:'Hata oluştu'};
+export const validationLabels:Record<string,string>={needs_review:'İnceleme bekliyor',reviewed:'İncelendi',rejected:'Uygun değil'};
+export const accountLabels:Record<string,string>={store:'Mağaza sinyali',creator:'Creator sinyali',mixed:'Creator + mağaza sinyali',unknown:'Hesap türü belirsiz'};
+export function dateLabel(value:string,timeOnly=false){return new Intl.DateTimeFormat('tr-TR',{timeZone:'Europe/Istanbul',...(timeOnly?{hour:'2-digit',minute:'2-digit',second:'2-digit'}:{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}).format(new Date(value));}
+export function stopLabel(reason:string|null){
+ if(!reason)return'';
+ const labels:Record<string,string>={pool_transferred:'Bekleyen havuz yeni tura taşındı; eski harcama korundu',page_limit:'Turun sayfa bütçesi tamamlandı',no_new_links:'Yeni bağlantı kalmadı; görünür içerik ve ilişkili etiketler işlendi',insufficient_page_budget:'Yeni etiketten hesap bulup kaydetmek için yeterli sayfa bütçesi kalmadı',related_tag_limit:'Bu turda 6 ek etiket de işlendi; havuz genişletme sınırına ulaşıldı',profile_limit:'Turun profil sınırına ulaşıldı',time_limit:'Turun süresi tamamlandı',candidate_pool_exhausted:'Havuzdaki adaylar işlendi',discovery_deferred:'Kalan gönderiler sonraki tura bırakıldı',daily_budget:'Günlük ziyaret bütçesi doldu',cancelled_by_user:'Araştırma durduruldu',worker_interrupted:'İşçi yeniden başlatılıyor',consecutive_transport_errors:'Art arda bağlantı hataları nedeniyle bekleniyor',consecutive_profile_layout_errors:'Art arda 3 profil okunamadı; sayfa yapısını kontrol etmek için tur duraklatıldı'};
+ if(labels[reason])return labels[reason];
+ if(/challenge|captcha/i.test(reason))return'Instagram doğrulaması gerekiyor';
+ if(reason==='consecutive_tag_read_errors')return'Üç etiket art arda okunamadı; bağlantı veya sayfa yapısını kontrol etmek için araştırma duraklatıldı. Kayıtlar ve bekleyen bağlantılar korundu.';
+ if(/rate-limit|429/i.test(reason))return'Instagram istekleri sınırladı; araştırma duraklatıldı';
+ if(reason==='INSTAGRAM_STOP:layout: Recognized public profile title and main content not found')return'Tek bir profil okunamadığı için eski akış duraklamış. Sorunlu profili atlayıp devam edebilirsin.';
+ if(/access-denied|403/i.test(reason))return'Instagram erişimi reddetti; araştırma duraklatıldı';
+ if(/Tag result links unavailable/i.test(reason))return'Etiket sayfasında gönderi bağlantısı okunamadı. Boş sonuç, yükleme veya erişim sorunu olabilir; araştırma duraklatıldı.';
+ if(/layout/i.test(reason))return'Sayfa yapısı tanınamadı; yanlış veri kaydetmemek için araştırma duraklatıldı.';
+ if(/login/i.test(reason))return'Instagram oturumunu kontrol et';
+ if(/net::|timeout|connection/i.test(reason))return'Kaynağa bağlanılamadı; ilerleme kaydedildi';
+ return`Araştırma beklemeye alındı: ${reason}`;
+}
+function handle(raw:string){try{return'@'+new URL(raw).pathname.split('/').filter(Boolean)[0];}catch{return'Profil';}}
+export function logLabel(message:string){
+ let m:RegExpMatchArray|null;
+ if((m=message.match(/^Continuous scan cycle: (\d+); automatic selection=(.+)$/))){try{const selected=JSON.parse(m[2]);return`Otomatik tarama · tur ${m[1]} · ${selected.topics.join(', ')} · ${countries[selected.country]??selected.country}`;}catch{return'Otomatik tarama turu başladı';}}
+ if(message.startsWith('Instagram restriction detail: ')){try{const d=JSON.parse(message.slice('Instagram restriction detail: '.length));return`HTTP ${d.status} · ${resourceTypeLabels[d.resource_type]??d.resource_type} · ${d.main_document?'ana istek':'alt kaynak'} · ${d.url}${d.retry_after_at?' · Sunucu beklemesi: '+dateLabel(d.retry_after_at):' · Sunucu bekleme süresi bilinmiyor'}`;}catch{return'Kaynak kısıtı ayrıntısı kaydedildi';}}
+ if(message.startsWith('Headless Chromium session check:'))return'Oturum kontrolü: '+(message.includes(': authenticated')?'giriş açık':message.includes(': blocked')?'giriş kontrolünde kısıt görüldü':message.includes(': login_required')?'yeniden giriş gerekiyor':'sonuç belirsiz')+' · Bu kontrol araştırma erişimini doğrulamaz';
+ if(message.startsWith('Operator requested resume after manual check'))return'Yerel durdurma kaldırıldı; araştırma erişimi henüz doğrulanmadı';
+ if((m=message.match(/^Research target: (.+); requested pages: (\d+); effective pages: (\d+)$/))){try{const target=JSON.parse(m[1]);const parts=[target.country?(countries[target.country]??target.country):'Tüm ülkeler',target.city,target.gender==='female'?'Kadın beyanı':target.gender==='male'?'Erkek beyanı':null].filter(Boolean);return`Hedef: ${parts.join(' · ')}. Sayfa bütçesi: ${m[3]}${m[2]!==m[3]?` (istenen ${m[2]}, günlük kalana göre sınırlandı)`:''}`;}catch{return message;}}
+ if((m=message.match(/^Query budget share: (.+); pages=(\d+); priority=(local|general)/)))return`#${m[1].replace(/ /g,'')}: ${m[3]==='local'?'Türkçe arama önceliği':'genel arama'} · ilk tarama payı ${m[2]} ziyaret`;
+ if((m=message.match(/^Tag priority: (.+); new=(\d+); pages=(\d+)/)))return`#${m[1].replace(/ /g,'')} önceliği · geçmişte ${m[2]} yeni kayıt / ${m[3]} ziyaret`;
+ if((m=message.match(/^Pool expanded: (.+); additional tags (\d+)(?:\/6)?;/)))return`Havuz genişletildi: ${m[1]} · ${m[2]} ek etiket, mevcut bütçe korunuyor`;
+ if(message.startsWith('Tag scroll reserved:'))return'Etikette ek yükleme: 1 ziyaret bütçeden düşüldü';
+ if((m=message.match(/^Tag collection finished: (.+); reason=([^;]+); scrolls=(\d+); new=(\d+)/)))return`#${m[1].replace(/ /g,'')}: ${m[4]} yeni bağlantı, ${m[3]} ek yükleme · ${({target_reached:'hedeflenen bağlantılar toplandı',no_new_links:'iki yüklemede yeni bağlantı gelmedi',budget_or_share:'diğer etiket ve profil ziyaretleri için bütçe ayrıldı',empty:'etikette sonuç yok'} as Record<string,string>)[m[2]]??m[2]}`;
+ if(message.startsWith('Profile layout skipped without retry:'))return'Profil yapısı okunamadı; profil tekrar denenmeden atlandı, araştırma sürüyor';
+ if(message.startsWith('Legacy profile layout isolated without retry:'))return'Önceki turdaki okunamayan profil atlandı; kalan kuyruk ve bütçe korundu';
+ if(message.startsWith('Recent profile skipped before visit:'))return'Yakın zamanda kaydedilen profil tekrar açılmadan atlandı';
+ if(message.startsWith('Cached post owner reused without visit:'))return'Kayıtlı gönderi sahibi kullanıldı; gönderi yeniden açılmadı';
+ if((m=message.match(/^Research validation: (@[^;]+); category=([^;]+); overall=(.+)$/)))return`${m[1]} · ${categoryMatchLabels[m[2]]??m[2]} · ${researchMatchLabels[m[3]]??m[3]}`;
+ if((m=message.match(/^Research allocation: enrichment=(\d+); discovery=(\d+); queued=(\d+)/)))return`Bütçe: ${m[2]} keşif + ${m[1]} iyileştirme · ${m[3]} hesap iyileştirme kuyruğunda`;
+ if(message.startsWith('Enrichment budget exhausted:'))return'İyileştirme payı tamamlandı; kalan bütçe keşifte kullanılacak';
+ if(message.startsWith('Enrichment visit reserved:'))return'İyileştirme kuyruğu ziyareti bütçeden ayrıldı';
+ if((m=message.match(/^Pool continuation: source=(\d+); new budget=(\d+)/)))return`#${m[1]} havuzu yeni tura taşındı · yeni bütçe ${m[2]} sayfa · eski bütçe korundu`;
+ if(message.startsWith('Research quality upgrade:'))return'Araştırma ölçümü güncellendi; kayıtlı kuyruk ve bütçe korundu';
+ if((m=message.match(/^Learned query withheld: ([^;]+)/)))return`#${m[1]} beklemeye alındı · kategori veya hedef kanıtı artık yeterli değil`;
+ if(message.startsWith('Selective review deferred:'))return'Seçici inceleme payı tamamlandı; kalan bütçe keşif ve profil ziyaretlerine ayrıldı';
+ if(message.startsWith('Post route skipped:'))return'Desteklenmeyen gönderi adresi atlandı; profil ve diğer açıklamalar korunuyor';
+ if((m=message.match(/^Query withheld: ([^;]+); (.+)$/)))return`#${m[1]} beklemeye alındı · ${tagOutcomeLabels[m[2]]??m[2]}`;
+ if(message.startsWith('Caption visit reserved:'))return'Gönderi açıklaması ziyareti bütçeden ayrıldı';
+ if((m=message.match(/^Target validation: @([^;]+); (.+)/)))return`@${m[1]} hedef kontrolü: ${({matched:'eşleşti',estimated:'dil tahminiyle eşleşti',unknown:'yetersiz kanıt',different:'farklı',not_requested:'filtre yok'} as Record<string,string>)[m[2]]??m[2]}`;
+ if(message.startsWith('Job started:'))return'Araştırma başladı';
+ if((m=message.match(/^Discovery instagram_tags: (.+)/)))return`#${m[1].replace(/ /g,'')} etiketi aranıyor`;
+ if((m=message.match(/^Discovery found (\d+) normalized links for (.+)/)))return`${m[1]} bağlantı havuza alındı · #${m[2].replace(/ /g,'')}`;
+ if((m=message.match(/^(?:Discovery|Night run) waiting (\d+)s/)))return`Sonraki ziyaret için ${m[1]} saniye bekleniyor`;
+ if((m=message.match(/^Discovery author: (https:\/\/[^;]+); caption (.+)/)))return`${handle(m[1])} doğrulandı · ${m[2]==='collected'?'açıklama alındı':'açıklama alınamadı'}`;
+ if((m=message.match(/^Post owner failed: ([^;]+); (.+)$/)))return`${ownerFailureLabels[m[1]]??m[1]} · ${m[2]}`;
+ if((m=message.match(/^Discovery frontier: total=(\d+); untried=(\d+); learned=(\d+); cooling=(\d+)/)))return`Kalıcı sorgu havuzu: ${m[1]} terim · ${m[2]} denenmemiş · ${m[3]} içerikten öğrenilen · ${m[4]} dinleniyor`;
+ if(message.startsWith('Frontier expanded: '))return'Kalıcı havuzdan yeni sorgular: '+message.slice(19).split(';')[0];
+ if(message.startsWith('Discovery author: unavailable'))return'Gönderi sahibi doğrulanamadı; hesap eklenmedi';
+ if(message.startsWith('Discovery skipped recent post:'))return'Yakın zamanda incelenen gönderi yeniden açılmadan atlandı';
+ if((m=message.match(/^Night profile: (.+)/)))return`${handle(m[1])} profili inceleniyor`;
+ if((m=message.match(/^Night candidate checkpoint committed: (.+)/)))return`${handle(m[1])} sınıflandırıldı ve kaydedildi`;
+ if(message.startsWith('Night creator caption:'))return'Creator’ın gönderi açıklaması inceleniyor';
+ if(message.startsWith('Discovery transport error'))return'Gönderiye bağlanılamadı; tekrar denenmeden atlandı';
+ if(message.startsWith('Transport error isolated'))return'Bağlantı hatası ayrıştırıldı; mevcut kanıt korundu';
+ if(message.startsWith('Three consecutive'))return'Art arda bağlantı hataları; keşif ertelendi';
+ if((m=message.match(/^Tag query skipped: ([^;]+); ([^;]+)/)))return`#${m[1]} atlandı · ${tagOutcomeLabels[m[2]]??m[2]} · kalan havuzla devam ediliyor`;
+ if((m=message.match(/^Tag query outcome: ([^;]+); (empty|unavailable)/)))return`#${m[1]} · ${m[2]==='empty'?'açık boş sonuç':'etiket sayfası mevcut değil'}`;
+ if(message.startsWith('Legacy tag layout isolated'))return'Sorunlu etiket yeniden denenmeden atlandı; bekleyen bağlantılar korundu';
+ if(message.startsWith('Night run paused:'))return stopLabel(message.slice(18));
+ if(message.startsWith('Automatic research:'))return message.includes('continued')?'Bekleyen havuz devralındı':'Araştırma alanından otomatik havuz oluşturuluyor';
+ if(message==='Job finished')return'İşlem tamamlandı';
+ return message;
+}
+
+export function locationLabel(c:Pick<Creator,'country'|'location_status'|'country_estimate'>){if(c.country)return(countries[c.country]??c.country)+(c.location_status==='language_estimate'?' · Dilden tahmin (düşük güven)':' · Açık ikamet beyanı');if(c.location_status==='conflicting')return'Çelişen konum beyanları';if(c.country_estimate?.language)return c.country_estimate.language.toUpperCase()+' · Birden fazla olası ülke';return'Ülke tahmini için metin yetersiz';}
+
+export const turkeyLabels={matched:'Türkiye eşleşmesi',estimated:'Türkiye tahmini',unknown:'Ülkesi belirlenemeyen',different:'Diğer ülkeler'};
+export type TurkeyStatus=keyof typeof turkeyLabels;
+export function turkeyStatus(c:Pick<Creator,'country'|'location_status'>):TurkeyStatus{return c.country==='TR'?(c.location_status==='language_estimate'?'estimated':'matched'):c.country?'different':'unknown';}

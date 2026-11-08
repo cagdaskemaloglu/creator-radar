@@ -1,0 +1,4 @@
+export const uncertaintyLabels:Record<string,string>={category_uncertain:'Kategori kanıtı yetersiz',country_unknown:'Ülke kanıtı yetersiz',city_unknown:'Şehir kanıtı yetersiz',gender_unknown:'İstenen profil beyanı bulunamadı',country_conflicting:'Çelişen konum beyanı'};
+export const coverageLabels:Record<string,string>={biography_missing:'Biyografi alınamadı',caption_missing:'Gönderi açıklaması alınamadı'};
+export const reviewLabels:Record<string,string>={disabled:'Ek açıklama okuması kapalı',not_needed:'Ek inceleme gerekmedi',completed:'Ek inceleme yapıldı',budget_deferred:'İnceleme bütçesi nedeniyle ertelendi',no_posts:'İncelenebilir gönderi bulunamadı',evidence_unavailable:'Açıklama veya sahiplik doğrulanamadı',source_blocked:'Kaynak erişimi nedeniyle durdu'};
+export type ReviewAssessment={status:string;before:string;after:string;attempts:number;new_evidence:number;resolved:boolean;became_qualified:boolean};

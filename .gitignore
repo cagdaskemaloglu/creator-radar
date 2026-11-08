@@ -1,0 +1,13 @@
+node_modules/
+.next/
+.env*
+!.env.example
+data/*
+!data/.gitkeep
+browser-profile/
+*.tsbuildinfo
+
+.next-validation/
+
+# Preserved local build cache from relocation
+.next-before-relocation-*/

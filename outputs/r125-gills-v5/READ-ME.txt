@@ -1,0 +1,6 @@
+UNSCALED REFERENCE - NOT FULL-SIZE PRINT FILE.
+Physical dimensions and mounting points have not been calibrated.
+STL retains original model units. Import dimensions are not real millimetres.
+Source: Yamaha YZF R125 by Nieve5677 (@niev), CC BY 4.0
+https://sketchfab.com/3d-models/yamaha-yzf-r125-365f2dc0e5464d618e434c16269743b0
+Modified: isolated panel and integral three-gill surface design.

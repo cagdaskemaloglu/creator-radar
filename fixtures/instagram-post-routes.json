@@ -1,0 +1,8 @@
+{
+  "description":"Reduced and anonymized visible-link structures from three operator-authorized diagnostic pages on 2026-11-06. Instagram served /p/<code>/ with canonical and owner timestamp /reel/<same-code>/. No body, credentials or comments retained.",
+  "cases":[
+    {"code":"ObservedRouteA","owner":"fixture_owner_a"},
+    {"code":"ObservedRouteB","owner":"fixture_owner_b"},
+    {"code":"ObservedRouteC","owner":"fixture_owner_c"}
+  ]
+}
