@@ -11,3 +11,7 @@ browser-profile/
 
 # Preserved local build cache from relocation
 .next-before-relocation-*/
+
+# Database snapshot awaits a decision on the public repository's visibility.
+shared-data/*.sqlite
+shared-data/*.tmp

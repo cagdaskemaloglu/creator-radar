@@ -1,0 +1,28 @@
+{
+  "created_at": "2026-11-10T06:30:05.556Z",
+  "file": "radar.snapshot.sqlite",
+  "bytes": 12054528,
+  "sha256": "ecee2d7cbe3ff2680c94fc7c0ef91ba3a40d468065cadcddfc2e7c6f38ead51b",
+  "counts": {
+    "candidate_work": 0,
+    "continuous_scan": 1,
+    "creator_evaluations": 0,
+    "creator_metrics": 975,
+    "creator_sources": 975,
+    "creators": 882,
+    "discovery_frontier": 784,
+    "discovery_observations": 276,
+    "discovery_queries": 1041,
+    "discovery_results": 9171,
+    "ingestion_jobs": 140,
+    "logs": 12302,
+    "research_activity": 9,
+    "research_candidates": 1165,
+    "research_posts": 1348,
+    "research_quarantine": 1,
+    "research_runs": 84,
+    "suppressions": 0
+  },
+  "automatic_work_disabled": true,
+  "contains_browser_session": false
+}
