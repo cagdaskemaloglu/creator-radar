@@ -38,8 +38,8 @@ test('real PostgreSQL migrations, shared storage contract, transfer and rollback
     };
     const target = await connect('contract');
     await t.test('migrations are transactional, idempotent and checksum protected', async () => {
-      assert.equal((await migrate(target, { check: true })).length, 6);
-      assert.equal((await migrate(target)).length, 6);
+      assert.equal((await migrate(target, { check: true })).length, 8);
+      assert.equal((await migrate(target)).length, 8);
       assert.deepEqual(await migrate(target), []);
       const changed = join(dir, 'changed'); mkdirSync(changed);
       writeFileSync(join(changed, '003_discovery.sql'),readFileSync('migrations/003_discovery.sql','utf8'));
@@ -52,8 +52,8 @@ test('real PostgreSQL migrations, shared storage contract, transfer and rollback
       await assert.rejects(migrate(clean, { directory: failing }));
       assert.equal((await first(clean, "SELECT to_regclass('public.should_rollback') AS name"))?.name, null);
       assert.equal((await first(clean, "SELECT to_regclass('public.radar_schema_migrations') AS name"))?.name, null);
-      const tables = await all(target, "SELECT relname FROM pg_class WHERE relname IN ('creators','creator_sources','creator_metrics','suppressions','ingestion_jobs','logs','research_runs','research_candidates','research_posts','discovery_queries','discovery_results','discovery_frontier','discovery_observations','candidate_work','creator_evaluations','continuous_scan') AND relrowsecurity");
-      assert.equal(tables.length, 16);
+      const tables = await all(target, "SELECT relname FROM pg_class WHERE relname IN ('creators','creator_sources','creator_metrics','suppressions','ingestion_jobs','logs','research_runs','research_candidates','research_posts','discovery_queries','discovery_results','discovery_frontier','discovery_observations','candidate_work','creator_evaluations','continuous_scan','research_activity','research_quarantine') AND relrowsecurity");
+      assert.equal(tables.length, 18);
     });
     const { CreatorStore } = await import('../lib/db');
     const { storageContract } = await import('./storage-contract');
@@ -93,8 +93,17 @@ test('real PostgreSQL migrations, shared storage contract, transfer and rollback
     const {httpRestrictionContract}=await import('./http-restriction-contract');
     await t.test('HTTP restriction proof, server waits and identity-aware owner caching',async()=>{const d=await connect('http_restriction');await migrate(d);await httpRestrictionContract(new CreatorStore(d));});
     const sqlite = new SQLiteDatabase(join(dir, 'source.sqlite'));
+    await t.test('bounded HTTP retry and three-request circuit preserve PostgreSQL visit budgets',async()=>{
+      const d=await connect('request_recovery');await migrate(d);const store=new CreatorStore(d);const {writeResearchState}=await import('../lib/instagram-state');let clock=Date.now();writeResearchState({day:new Date(clock).toISOString().slice(0,10),visits:0,lastVisitAt:0,paused:false,reason:null,pausedAt:null});
+      const {enqueue}=await import('../lib/job-input'),{researchNight}=await import('../lib/night-research'),{NightStore}=await import('../lib/night-store'),{InstagramStop}=await import('../lib/instagram-extract');const request={content:'',limit:20,permission:'Own synthetic PostgreSQL retry fixture',efficientResearch:true,discoveryEnabled:true,discoveryKeywords:['retryone','retrytwo','retrythree'],discoveryProviders:['instagram_tags' as const],discoveryMaxQueries:3,discoveryResultsPerQuery:10,nightMaxPages:30,nightMaxPosts:0,nightMaxDepth:0,nightHours:8};const id=await enqueue({kind:'instagram_night',source:'synthetic-pg-retry',...request},store);await store.claimJob();let calls=0;
+      await researchNight(id,request,store,new AbortController().signal,{now:()=>clock,sleep:async ms=>{clock+=ms;},discovery:{search:async()=>{calls++;throw new InstagramStop('rate-limit','HTTP 429',{status:429,url:'https://www.instagram.com/p/PGFixture/',page_url:'https://www.instagram.com/p/PGFixture/',method:'GET',resource_type:'document',main_document:true,observed_at:new Date(clock).toISOString(),retry_after_at:null,retry_after_seconds:null});}}});const r=(await new NightStore(store).reports())[0];assert.equal(calls,5);assert.equal(r.page_requests,5);assert.equal(r.status,'paused');
+    });
+    await t.test('customer portal read-only filters, visibility, pagination and safe projection',async()=>{const d=await connect('portal');await migrate(d);const {portalContract}=await import('./portal-contract');await portalContract(new CreatorStore(d));});
+    await t.test('phase-specific access recovery and active session timing on PostgreSQL',async()=>{const d=await connect('observability');await migrate(d);const {observabilityContract}=await import('./research-observability-contract');await observabilityContract(new CreatorStore(d));});
+    await t.test('bounded technical recovery and durable quarantine on PostgreSQL',async()=>{const d=await connect('resilience');await migrate(d);const {resilienceContract}=await import('./continuous-resilience-contract');await resilienceContract(new CreatorStore(d));});
     try {
       const sourceStore = new CreatorStore(sqlite);
+      const {TechnicalQuarantine}=await import('../lib/technical-recovery');await new TechnicalQuarantine(sourceStore).add('profile','https://www.instagram.com/transfer_fixture/','network_error');
       await storageContract(sourceStore);
       await nightContract(sourceStore);
       await discoveryContract(sourceStore);

@@ -1,3 +1,5 @@
+import {TechnicalQuarantine} from './technical-recovery';
+import {RequestRecovery,RequestSkipped} from './request-recovery';
 import {logRestriction} from './instagram-restriction';
 import {queryBudgetShares} from './query-budget';
 import {InstagramPostRouteError} from './instagram-post-policy';
@@ -16,17 +18,19 @@ import { readResearchState,writeResearchState,pauseInstagram } from './instagram
 import { researchLimits,instagramWaitMs } from './instagram-policy';
 import { InstagramStop } from './instagram-extract';
 import { first,safeId } from './storage/driver';
-export type DiscoveryDependencies={search?:(query:DiscoveryQuery,limit:number,signal:AbortSignal,collection?:TagCollectionOptions)=>Promise<DiscoveryResponse>;author?:(url:string,signal:AbortSignal)=>Promise<string|{profile:string|null;evidence:PostEvidence|null;reason?:import('./instagram-post-owner').OwnerFailure|null}|null>;now?:()=>number;sleep?:(ms:number,signal:AbortSignal)=>Promise<void>};
+export type DiscoveryDependencies={recovery?:RequestRecovery|false;search?:(query:DiscoveryQuery,limit:number,signal:AbortSignal,collection?:TagCollectionOptions)=>Promise<DiscoveryResponse>;author?:(url:string,signal:AbortSignal)=>Promise<string|{profile:string|null;evidence:PostEvidence|null;reason?:import('./instagram-post-owner').OwnerFailure|null}|null>;now?:()=>number;sleep?:(ms:number,signal:AbortSignal)=>Promise<void>};
 export class DiscoveryLimit extends Error{constructor(readonly code:string,readonly terminal:boolean){super(code);}}
 export async function runDiscovery(job:number,settings:DiscoverySettings,store:CreatorStore,signal:AbortSignal,limits:{maxPages:number;maxProfiles:number;deadline:number;maxPosts?:number;batchSize?:number},deps:DiscoveryDependencies={}){
  if(!settings.enabled)return;
  const repo=new DiscoveryStore(store),now=deps.now??Date.now,sleep=deps.sleep??(async(ms,s)=>{await delay(ms,undefined,{signal:s});});
  const search=deps.search??(async(q,n,s,options)=>q.provider==='google'?searchGoogle(q,n,s):searchInstagramTag(q,n,s,undefined,options));
+ const quarantine=new TechnicalQuarantine(store);
  const author=deps.author??((url,signal)=>resolvePostWithEvidence(url,signal,Boolean(limits.maxPosts)));
  await repo.initialize(job,buildDiscoveryPlan(settings));await repo.restore(job);
  const active=async()=>{signal.throwIfAborted();if(await store.isCancelled(job))throw new Error('Cancelled');if(now()>=limits.deadline)throw new DiscoveryLimit('time_limit',true);};
+ const recovery=deps.recovery===false?null:deps.recovery??new RequestRecovery(store,job,signal,now,(ms,s)=>sleep(Math.min(ms,Math.max(0,limits.deadline-now())),s));
  const reserve=async(provider:DiscoveryProvider,query:number,result?:number,scroll=false)=>{
-  await active();const run=await first(store.database,'SELECT page_requests FROM research_runs WHERE job_id=$1',[job]);if(Number(run?.page_requests)>=limits.maxPages)throw new DiscoveryLimit('page_limit',true);
+  await recovery?.beforeNext(active);await active();const run=await first(store.database,'SELECT page_requests FROM research_runs WHERE job_id=$1',[job]);if(Number(run?.page_requests)>=limits.maxPages)throw new DiscoveryLimit('page_limit',true);
   const google=provider==='google'&&!result;
   const policy=google?googleLimits():{intervalMs:researchLimits().intervalMs,daily:researchLimits().dailyPages};
   let state=google?readGoogleState(now()):readResearchState(now());
@@ -55,17 +59,20 @@ export async function runDiscovery(job:number,settings:DiscoverySettings,store:C
  // when every pending post belongs to a poor or exhausted query share.
  let drainPending=false;
  for(const post of initialPending)if(!fair||(costs.get(safeId(post.query_id))??0)+2<=await tagShare(safeId(post.query_id))){drainPending=true;break;}
+ if(initialPending.length&&readResearchState(now()).requestScopes?.post?.failed)drainPending=true;
  const withheld=new Map(settings.scopeKey?(await new DiscoveryFrontier(store).ranked(settings.scopeKey)).filter(q=>!q.eligible).map(q=>[discoveryQueryKey(q.provider,q.keyword),q.origin] as const):[]);
  let searched=0,authorVisits=0;
  const queries=batched&&!settings.scopeKey?await repo.prioritizedQueries(job):await repo.queries(job);
  if(settings.scopeKey){const order=new Map(settings.keywords.map((k,i)=>[discoveryQueryKey('instagram_tags',k),i]));queries.sort((a,b)=>Number(isPreferred(b.provider,b.keyword))-Number(isPreferred(a.provider,a.keyword))||((frontierRows.find(f=>discoveryQueryKey(f.provider,f.keyword)===discoveryQueryKey(String(b.provider),String(b.keyword)))?.score??1/3)-(frontierRows.find(f=>discoveryQueryKey(f.provider,f.keyword)===discoveryQueryKey(String(a.provider),String(a.keyword)))?.score??1/3))||(order.get(discoveryQueryKey(String(a.provider),String(a.keyword)))??10000)-(order.get(discoveryQueryKey(String(b.provider),String(b.keyword)))??10000));}
  else if(preferred.size)queries.sort((a,b)=>Number(isPreferred(b.provider,b.keyword))-Number(isPreferred(a.provider,a.keyword)));
  for(const row of queries){
-  if(batched&&((drainPending&&!tryNextTag)||searched>=1||await backlog()>0))break;
+  if(batched&&((drainPending&&(!tryNextTag||Boolean(readResearchState(now()).requestScopes?.post?.failed)))||searched>=1||await backlog()>0))break;
 
   await active();if(row.status!=='pending')continue;
+  if(recovery&&readResearchState(now()).requestScopes?.post?.failed){await store.log(job,'Gönderi erişimi sorunlu; yeni etiket araması bekletildi');throw new DiscoveryLimit('post_access_deferred',false);}
   const n=await first(store.database,'SELECT count(*) AS n FROM research_candidates WHERE job_id=$1',[job]);if(batched?await backlog()>=Number(limits.batchSize):Number(n?.n)>=limits.maxProfiles)break;
   const id=safeId(row.id),query:DiscoveryQuery={provider:row.provider as DiscoveryProvider,keyword:String(row.keyword),url:String(row.query_url)};
+  if(query.provider==='instagram_tags'&&await quarantine.get('tag',query.url,now())){await repo.skipQuery(id,'technical_quarantine');await store.log(job,'Etiket geçici olarak atlandı: '+query.url);continue;}
   if(withheld.has(discoveryQueryKey(query.provider,query.keyword))){const reason=withheld.get(discoveryQueryKey(query.provider,query.keyword))==='observed'?'learned_term_evidence_insufficient':'curated_term_removed';await repo.skipQuery(id,reason);await store.log(job,`Query withheld: ${query.keyword}; ${reason}`);continue;}
   try{
    if(batched&&Number(row.result_count)>=settings.resultsPerQuery){await repo.complete(job,id,[]);continue;}
@@ -87,13 +94,15 @@ export async function runDiscovery(job:number,settings:DiscoverySettings,store:C
     },onBatch:async urls=>{await repo.appendResults(job,id,uniqueDiscoveryLinks(urls.map(url=>({url,title:''})),settings.resultsPerQuery));}};
    }
    const target=batched?Math.max(1,settings.resultsPerQuery-Number(row.result_count)):settings.resultsPerQuery;
-   const response=await search(query,target,signal,collection);await active();
+   const response=query.provider==='instagram_tags'&&recovery?await recovery.run(query.url,()=>search(query,target,signal,collection),()=>reserve(query.provider,id),active,'tag'):await search(query,target,signal,collection);await active();
    if(response.collection)await store.log(job,`Tag collection finished: ${query.keyword}; reason=${response.collection.reason}; scrolls=${response.collection.scrolls}; new=${response.collection.newLinks}`);
    // Revalidate even adapter/test results; snippets and matching search terms are discovery hints only.
    const links=uniqueDiscoveryLinks(response.links,settings.resultsPerQuery);
    await repo.complete(job,id,links,response.outcome==='empty'?'empty_results':response.outcome==='unavailable'?'tag_unavailable':null);if(response.outcome)await store.log(job,`Tag query outcome: ${query.keyword}; ${response.outcome}`);await store.log(job,`Discovery found ${links.length} normalized links for ${query.keyword}`);
   }catch(e){
+   if(e instanceof RequestSkipped){await repo.skipQuery(id,e.message);continue;}
    if(!signal.aborted&&query.provider==='instagram_tags'&&e instanceof InstagramTagReadError){
+    await quarantine.add('tag',query.url,e.reason==='tag_load_failed'?'network_error':'layout_unreadable',now());
     await repo.skipQuery(id,e.reason);await store.log(job,`Tag query skipped: ${query.keyword}; ${e.reason}; pending links retained`);
     if(await repo.consecutiveTagErrors(job))throw new DiscoveryLimit('consecutive_tag_read_errors',false);
     continue;
@@ -108,11 +117,12 @@ export async function runDiscovery(job:number,settings:DiscoverySettings,store:C
  const posts=batched?await repo.prioritizedPosts(job):await repo.pendingPosts(job);
  const queryMap=new Map((await repo.queries(job)).map(q=>[safeId(q.id),q]));
  if(preferred.size)posts.sort((a,b)=>{const qa=queryMap.get(safeId(a.query_id)),qb=queryMap.get(safeId(b.query_id));return Number(isPreferred(qb?.provider,qb?.keyword))-Number(isPreferred(qa?.provider,qa?.keyword));});
- const spreading=fair&&[...queryMap.values()].some(q=>q.status==='pending');
+ const spreading=!readResearchState(now()).requestScopes?.post?.failed&&fair&&[...queryMap.values()].some(q=>q.status==='pending');
  for(const row of posts){
   await active();const n=await first(store.database,'SELECT count(*) AS n FROM research_candidates WHERE job_id=$1',[job]);if(batched?await backlog()>=Number(limits.batchSize):Number(n?.n)>=limits.maxProfiles)break;
   const id=safeId(row.id),query=safeId(row.query_id),url=String(row.source_url);
   if(spreading&&((await repo.queryPageCosts(job,true)).get(query)??0)+2>await tagShare(query))continue;
+  if(await quarantine.get('post',url,now())){await repo.skipRecent(id,null,'technical_quarantine');await store.log(job,'Gönderi geçici olarak atlandı: '+url);continue;}
   const known=batched?await repo.knownPostOwner(url):null;
   if(known){await repo.skipRecent(id,known,'known_profile_discovery_only');await store.log(job,'Known post owner skipped without visit: '+url);continue;}
   const recent=await repo.recentlyResolved(job,url,now());
@@ -124,7 +134,7 @@ export async function runDiscovery(job:number,settings:DiscoverySettings,store:C
    // entire page budget resolving post authors before a single record is saved.
    const run=await first(store.database,'SELECT page_requests FROM research_runs WHERE job_id=$1',[job]);
    if(Number(run?.page_requests)+Math.max(1,Math.min(batched?await backlog():Number(n?.n),limits.maxProfiles))>=limits.maxPages)break;
-   await reserve('instagram_tags',query,id);authorVisits++;const resolved=await author(url,signal);await active();consecutiveTransportErrors=0;
+   await reserve('instagram_tags',query,id);authorVisits++;const resolved=recovery?await recovery.run(url,()=>author(url,signal),()=>reserve('instagram_tags',query,id),active,'post'):await author(url,signal);await active();consecutiveTransportErrors=0;
    const profile=typeof resolved==='string'?resolved:resolved?.profile;
    const evidence=typeof resolved==='object'?resolved?.evidence:null;
    const normalized=profile?normalizeDiscoveryLink(profile):null;
@@ -133,10 +143,11 @@ export async function runDiscovery(job:number,settings:DiscoverySettings,store:C
    if(normalized?.kind!=='profile')await store.log(job,`Post owner failed: ${failure}; ${url}`);
    await store.log(job,`Discovery author: ${normalized?.kind==='profile'?normalized.url:'unavailable'}; caption ${evidence?'collected':'unavailable'}`);
   }catch(e){
+   if(e instanceof RequestSkipped){await repo.skipRecent(id,null,e.message);continue;}
    const message=e instanceof Error?e.message.split('\n')[0]:'';
    if(!signal.aborted&&e instanceof InstagramPostRouteError){await repo.skipRecent(id,null,'unsupported_post_route');await store.log(job,`Post owner failed: unsupported_post_route; ${url}`);continue;}
    if(!signal.aborted&&!(e instanceof InstagramStop)&&/net::ERR_(CONNECTION_CLOSED|CONNECTION_RESET|CONNECTION_TIMED_OUT|NETWORK_CHANGED)\b|(?:page\.goto|navigation).*Timeout|Timeout.*(?:page\.goto|navigation)/i.test(message)){
-    await repo.skipRecent(id,null,'page_not_loaded');await store.log(job,`Post owner failed: page_not_loaded; ${url}`);
+    await quarantine.add('post',url,'network_error',now());await repo.skipRecent(id,null,'page_not_loaded');await store.log(job,`Post owner failed: page_not_loaded; ${url}`);
     await store.log(job,`Discovery transport error; post skipped without retry: ${url}`);
     if(++consecutiveTransportErrors>=3){await store.log(job,'Three consecutive transport errors; discovery deferred, verified candidates retained for processing');return{deferred:true};}
     continue;

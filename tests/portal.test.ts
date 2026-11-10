@@ -1,0 +1,3 @@
+import {test} from 'node:test';import {mkdtempSync} from 'node:fs';import {join} from 'node:path';import {tmpdir} from 'node:os';
+const dir=mkdtempSync(join(tmpdir(),'radar-portal-'));process.env.RADAR_STORAGE='sqlite';process.env.RADAR_DB=join(dir,'singleton.sqlite');
+test('customer portal searches real visible records with bounded pagination and no admin data',async()=>{const {SQLiteDatabase}=await import('../lib/storage/sqlite'),{CreatorStore}=await import('../lib/db'),{portalContract}=await import('./portal-contract');const db=new SQLiteDatabase(join(dir,'portal.sqlite'));try{await portalContract(new CreatorStore(db));}finally{await db.close();}});

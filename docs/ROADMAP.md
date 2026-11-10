@@ -4,7 +4,7 @@ Tamamlanan özellikler için `STATUS.md` dosyasına bak. Aşağıdakiler öneril
 
 ## P0 — Ölçüm ve doğruluk
 1. İnsan değerlendirmeli, kategori/ülke/mağaza türü açısından dengeli bir örneklem oluştur. Model sürümüne göre doğruluk, yanlış pozitif ve belirsizlik oranını ölç.
-2. Gerçek aktif çalışma süresini; kapalı, duraklatılmış ve beklenen sürelerden ayır. Yeni/uygun hesap-saat ölçümünü düzelt.
+2. Temel aktif oturum/bekleme/kesinti ölçümü tamamlandı (migration 007). Sonraki adım ölçümlerin canlı örneklerle doğrulanması ve daha ayrıntılı aşama maliyetlerinin izlenmesi.
 3. Kategorisiz hesapları nedenlerine göre grupla: eksik veri, sözlük eksiği, çoklu kategori, düşük kanıt, hedef dışında. Panelde açık sayımlar sun.
 4. Bahçe, dekorasyon, alışveriş, aydınlatma ve mobilya örnekleriyle yerel bağlam kurallarının negatif testlerini büyüt. Kategori eklemeden önce mevcut kategoriyi kaçırıp kaçırmadığını ölç.
 5. Her yeni turda hedefe uygun yeni hesap / ziyaret ve bilinen hesap ziyaret kaybını karşılaştır. Etiket sıralamasındaki kazancı gerçek verilerle ölç.
@@ -14,7 +14,7 @@ Tamamlanan özellikler için `STATUS.md` dosyasına bak. Aşağıdakiler öneril
 - Eski kayıtları ziyaret etmeden yeniden değerlendirme ve alan bazlı kanıt tazeliği.
 - Satış kanalı için affiliate, marka elçisi, doğrudan satıcı ayrımını daha iyi ölç; doğrulanmamış siteyi otomatik sahiplenme.
 - Sürekli taramada sadece round-robin yerine ölçülmüş uygun-yeni hesap verimine göre alan seçimi; adil yeni alan keşfini koru.
-- Tekrarlayan sayfa hataları için daha anlaşılır operatör durumları; kaynak engelini geçici ağ hatasıyla karıştırma.
+- Sınırlı teknik toparlanma ve geçici adres karantinası tamamlandı (migration 008). Sonraki adım gerçek turlarda toparlanma verimini ve karantina sürelerini ölçmek.
 - Yedekleme/geri yükleme akışını standartlaştır ve otomatik geri yükleme testi ekle.
 
 ## P2 — SaaS'a hazırlık

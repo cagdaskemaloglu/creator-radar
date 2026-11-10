@@ -15,7 +15,7 @@ Panelde araştırma başlatılması gerekirse işçiyi açar. Sürekli tarama za
 ## Sürekli tarama
 Panelde ülke/kategori seçip “Otomatik taramayı başlat”. “Kategoriyi otomatik seç” işaretlenirse alanlar döner; ülke boşsa desteklenen ülkeler döner. Sayfa bütçesi her tur içindir. Bilgisayar ve işçi çalıştıkça turlar devam eder; panelin açık kalması gerekmez. “Otomatik taramayı durdur” kontrolü kapatır ve sahip olduğu aktif işi iptal eder.
 
-Kaynak kısıtında otomatik yeniden deneme/anahtar kaldırma yoktur. Bilinen Retry-After dolmadan kontrol/manuel açma/devam da reddedilir. Süre dolması erişimin açıldığı anlamına gelmez. Oturum kontrolü araştırma erişimini doğrulamaz.
+Ölçülen HTTP 403/429 için ilk istekte toplam üç deneme, en az iki dakika aralık, sonra sonraki isteğe geçiş uygulanır; üç farklı ardışık istekte aynı kod gelirse devre açılır. Açılmış kaynak kilidi, CAPTCHA veya giriş engeli otomatik kaldırılmaz. Bilinen Retry-After dolmadan kontrol/manuel açma/devam da reddedilir. Süre dolması erişimin açıldığı anlamına gelmez. Oturum kontrolü araştırma erişimini doğrulamaz.
 
 ## Dosyalar
 - `.env`: yerel ayarlar/gizli bilgiler; kopyalama veya sıfırlama yapma.
@@ -47,3 +47,19 @@ Tarayıcı testleri geçici profiller ve fixture/engellenmiş ağ yanıtları ku
 
 ## Şema/transfer
 PostgreSQL: `npm run db:migrate`. SQLite şeması uygulama açılışında oluşturulur. Veri taşıma için mevcut `db:transfer` dry-run/apply talimatlarını README'den izle. Önce sürekli taramayı durdur, aktif işleri bitir/iptal et, yedek al ve hedefin boş olduğunu doğrula. Taşıma yeni boş DB oluşturma bahanesi değildir.
+
+## Müşteri deneyimini açma
+http://127.0.0.1:3000/portal adresini veya menüdeki Müşteri portalı bağlantısını kullan.
+Bu ekran kayıtlı kütüphaneyi arar; araştırma başlatmaz, hesabı düzenlemez. Filtreleri
+uygulamak için Hesapları keşfet düğmesine bas. Ülke tahmini kartta ayrıca belirtilir.
+URL arama ayarlarını taşır. İnternete yayın veya müşteri üyelik/yetkisi bu yerel
+önizlemenin parçası değildir; admin erişimini bir menü görünümüyle sınırlandırma.
+
+## 2026-11-10 — Sürekli taramada teknik toparlanma
+Yalnız sürekli taramanın sahip olduğu turlarda, ardışık ağ/profil düzeni/etiket okuma hatalarında kontrollü devam vardır. İlk toparlanma 2 dakika, ikinci 5 dakika sonra; tur başına en fazla iki kez. Aynı iş/kuyruk, başlangıç zamanı ve sayfa bütçesi korunur. Tükenen süre/bütçede eski tur kapatılıp yeni tura geçilir; bekleyen havuz devam mekanizmasına bırakılır. Kullanıcı durdurması ve eşzamanlı başka araştırma önceliklidir.
+
+`research_quarantine` (PostgreSQL migration 008) teknik sorunlu profil/gönderi/etiket adreslerini ağ hatasında 30 dakika, düzen okunamamasında 2 saat ayırır. Gönderinin /p/ ve /reel/ biçimleri aynı kimliğe bağlanır. Süresi dolmuş adres sonraki keşifte yeniden değerlendirilebilir; eski turdaki skipped kayıtlar kendiliğinden pending yapılmaz. Diğer adaylar ziyaret edilip kaydedilebilir. Panel toparlanma nedenini, planlanan devam saatini ve etkin geçici adres sayısını gösterir.
+
+403/429 kaynak kilidi, sunucu bekleme süresi, CAPTCHA, giriş gereksinimi, kimlik çelişkisi, `post_access_deferred` ve tanınmayan hatalar bu toparlanmayla açılmaz. Mevcut HTTP yeniden deneme politikası ayrı kalır. Kapalı sürekli tarama kendiliğinden etkinleştirilmez; manuel araştırmalar otomatik devam kapsamına alınmaz.
+
+Bu güncellemenin doğrulaması: 134 birim/kontrat testi, 22 PostgreSQL testi, tip kontrolü, üretim derlemesi ve SQLite/PostgreSQL panel smoke testleri geçti. Testler canlı Instagram trafiği üretmedi. Teknik adreslerin ziyaret öncesi atlanması, sağlıklı adayın kaydı, iki toparlanma sınırı, bütçe korunması, kullanıcı durdurması ve kaynak kilidinin önceliği doğrulandı.

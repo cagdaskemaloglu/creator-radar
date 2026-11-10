@@ -25,5 +25,7 @@ Yüzlerce/binlerce profil hedefi ürün vizyonudur; mevcut erişim ve sayfa baş
 ## Bugünkü kapsam
 Yerel Next.js paneli, SQLite veya PostgreSQL, Playwright Chromium, manuel giriş, arka plan keşif işçisi, kalıcı kuyruk, sürekli tarama, kanıtlı sınıflandırma, filtreler ve CSV. 11 ana grup/68 alt kategori `lib/taxonomy.ts` içindedir.
 
+Yerel müşteri portalı `/portal` ile mevcut veritabanında arama deneyimi de vardır; üyelik/yetki veya internet yayını içermez.
+
 ## Henüz olmayanlar
 Çok kiracılı SaaS, müşteriye açık oturum/yetki/faturalama, bulut dağıtımı, kalibre edilmiş ML modeli, LLM/embedding sınıflandırması, tam küresel konum çözümleme, resmi API sağlayıcısı entegrasyonu ve satış/mağaza sahipliği doğrulaması. Kullanıcıya bu özellikleri mevcutmuş gibi sunma.

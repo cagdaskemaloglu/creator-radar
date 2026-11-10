@@ -6,6 +6,7 @@ export const TRANSFER_TABLES = [
   { name: 'suppressions', columns: ['username','instagram_user_id'] },
   { name: 'ingestion_jobs', columns: ['id','kind','payload','status','processed','inserted','updated','cancel_requested','created_at','completed_at','error'] },
   { name: 'logs', columns: ['id','job_id','message','created_at'] },
+  { name: 'research_activity', columns: ['id','job_id','started_at','last_seen_at','ended_at','active_ms','wait_ms','unobserved_ms','start_inserted','end_inserted','start_saved','end_saved'] },
   { name: 'research_runs', columns: ['job_id','settings','page_requests','started_at','finished_at','stop_reason'] },
   { name: 'research_candidates', columns: ['id','job_id','url','depth','status','attempts','profile_data','outcome','category','fit_score','reason','created_at','updated_at'] },
   { name: 'research_posts', columns: ['id','candidate_id','url','status','attempts','evidence','reason'] },
@@ -14,6 +15,7 @@ export const TRANSFER_TABLES = [
   { name: 'discovery_frontier', columns: ['id','scope_key','provider','keyword','query_url','origin','priority','evidence','created_at','updated_at'] },
   { name: 'discovery_observations', columns: ['query_id','frontier_id','pages','new_profiles','matched_profiles','observed_at'] },
   { name: 'candidate_work', columns: ['candidate_id','work_kind'] },
+  { name: 'research_quarantine', columns: ['kind','url','reason','last_seen_at','expires_at'] },
   { name: 'continuous_scan', columns: ['id','enabled','generation','config','cycle','job_id','next_at','status','message','updated_at'] },
   { name: 'creator_evaluations', columns: ['id','creator_id','verdict','predicted_category','expected_category','model_version','created_at'] },
 ] as const;

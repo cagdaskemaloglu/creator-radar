@@ -1,3 +1,4 @@
+import {recoverContinuousJob,isRecoverableReason} from './continuous-recovery';
 import {z} from 'zod';
 import type {CreatorStore} from './db';
 import {all,first,jsonObject,safeId} from './storage/driver';
@@ -18,14 +19,15 @@ export async function tickScan(store:CreatorStore,now=Date.now(),start=startAuto
  if(recovered){r.job_id=safeId(recovered.id);await store.database.query('UPDATE continuous_scan SET job_id=$1 WHERE id=1 AND generation=$2 AND enabled=1',[safeId(recovered.id),generation]);}
  const update=async(status:string,message:string,seconds=10)=>{await store.database.query('UPDATE continuous_scan SET status=$1,message=$2,next_at=$3,updated_at=$4 WHERE id=1 AND generation=$5 AND enabled=1',[status,message,stamp(now+seconds*1000),stamp(now),generation]);};
  if(process.env.INSTAGRAM_BROWSER_ENABLED==='false'||readResearchState(now).paused){await update('blocked','Instagram erişimi için manuel kontrol gerekiyor. Otomatik yeniden deneme yapılmıyor.',30);return;}
- if(r.job_id){const job=await first(store.database,'SELECT status,error FROM ingestion_jobs WHERE id=$1',[safeId(r.job_id)]);if(job&&['paused','failed'].includes(String(job.status))){await update('blocked','Araştırma durdu: '+String(job.error??job.status)+'. Manuel kontrol gerekiyor.',30);return;}}
+ if(r.job_id){const job=await first(store.database,'SELECT status,error FROM ingestion_jobs WHERE id=$1',[safeId(r.job_id)]);if(job&&['paused','failed'].includes(String(job.status))){if(isRecoverableReason(String(job.error))){const outcome=await recoverContinuousJob(store,safeId(r.job_id),generation,String(r.status),now);if(outcome==='unchanged')await update('blocked','Teknik toparlanma koşulları sağlanamadı; manuel kontrol gerekiyor.',30);return;}await update('blocked','Araştırma durdu: '+String(job.error??job.status)+'. Manuel kontrol gerekiyor.',30);return;}}
  if(await first(store.database,"SELECT id FROM ingestion_jobs WHERE kind='instagram_night' AND status IN ('queued','running') LIMIT 1")){await update('running','Aktif araştırmanın tamamlanması bekleniyor.');return;}
  const lease=await first(store.database,'UPDATE continuous_scan SET next_at=$1 WHERE id=1 AND enabled=1 AND generation=$2 AND (next_at IS NULL OR next_at<=$3) RETURNING id',[stamp(now+120000),generation,stamp(now)]);if(!lease)return;
  try{
+  await update('transitioning',r.job_id?'Önceki tur tamamlandı; yeni tur hazırlanıyor.':'İlk araştırma turu hazırlanıyor.',120);
   const config=configSchema.parse(jsonObject(r.config)),selection=scanSelection(config,Number(r.cycle));
   const result=await start(selection,store,generation);
   if(result.reused){await update('waiting','Başka araştırmanın tamamlanması bekleniyor.');return;}
-  const accepted=await first(store.database,"UPDATE continuous_scan SET job_id=$1,cycle=cycle+1,status='running',message=$2,next_at=$3,updated_at=$4 WHERE id=1 AND enabled=1 AND generation=$5 RETURNING id",[result.id,`${selection.topics.join(', ')} · ${countries[selection.country]}`,stamp(now+60000),stamp(now),generation]);
+  const accepted=await first(store.database,"UPDATE continuous_scan SET job_id=$1,cycle=cycle+1,status='running',message=$2,next_at=$3,updated_at=$4 WHERE id=1 AND enabled=1 AND generation=$5 RETURNING id",[result.id,`Yeni tur #${result.id} · ${selection.topics.join(', ')} · ${countries[selection.country]}`,stamp(now+60000),stamp(now),generation]);
   if(!accepted&&!result.reused)await store.cancel(result.id);
   if(accepted&&!result.reused)await store.log(result.id,'Continuous scan cycle: '+(Number(r.cycle)+1)+'; automatic selection='+JSON.stringify({topics:selection.topics,country:selection.country}));
  }catch(error){await update('waiting',error&&typeof error==='object'&&'code' in error?'Veritabanı işlemi başarısız; bağlantıyı kontrol et.':error instanceof Error?error.message:'Tarama planlanamadı',300);}

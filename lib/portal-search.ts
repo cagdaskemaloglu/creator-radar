@@ -1,0 +1,22 @@
+import {z} from 'zod';
+import {all,jsonObject,type Executor} from './storage/driver';
+import {profileSchema} from './model';
+import {cachedClassification} from './classification-cache';
+import {taxonomy,countries,categoryTerms} from './taxonomy';
+import {channelLabels,publicCommerceUrl} from './commerce';
+import {extractBiographyEmails} from './contact-emails';
+const schema=z.object({q:z.string().trim().max(80).default(''),category:z.string().refine(s=>!s||Object.hasOwn(categoryTerms,s)||taxonomy.some(g=>g.name===s)).default(''),country:z.string().refine(s=>!s||Object.hasOwn(countries,s)).default(''),gender:z.enum(['','female','male']).default(''),account:z.enum(['','creator','store','mixed','unknown']).default(''),selling:z.enum(['','sales_signals','channel_linked','unknown']).default(''),channel:z.string().refine(s=>!s||Object.hasOwn(channelLabels,s)).default(''),followers:z.enum(['','micro','medium','large']).default(''),sort:z.enum(['recent','followers_desc','followers_asc']).default('recent'),page:z.coerce.number().int().min(1).max(100000).default(1)});
+const normalize=(text:string)=>text.toLocaleLowerCase('tr-TR').normalize('NFD').replace(/\p{M}/gu,'').replace(/ı/g,'i');
+export function portalFilters(input:unknown){return schema.parse(input);}
+export type PortalCreator={id:number;username:string;display_name:string|null;biography:string|null;profile_url:string;followers_count:number|null;categories:string[];primary_niche:string|null;country:string|null;city:string|null;gender:string|null;location_status:string;account_type:string;selling_status:string;sales_channels:{channel:string;url:string|null}[];emails:string[];updated_at:string;reviewed:boolean;evidence:{category:string;keyword:string;excerpt:string}[]};
+export async function searchPortal(database:Executor,input:unknown){
+ const f=portalFilters(input);
+ const rows=await all(database,"SELECT c.id,c.username,c.payload,c.updated_at,c.validation_status FROM creators c WHERE c.validation_status<>'rejected' AND NOT EXISTS (SELECT 1 FROM suppressions s WHERE s.username=c.username)");
+ const records:PortalCreator[]=rows.flatMap(row=>{const p=profileSchema.parse(jsonObject(row.payload));if(p.synthetic)return[];const c=cachedClassification(p);return[{id:Number(row.id),username:p.username,display_name:p.display_name,biography:p.biography,profile_url:`https://www.instagram.com/${p.username}/`,followers_count:p.followers_count,categories:c.categories,primary_niche:c.primary_niche,country:c.country,city:c.city,gender:c.gender,location_status:c.location_status,account_type:c.account_type,selling_status:c.selling_status,sales_channels:c.sales_channels.map(s=>({channel:s.channel,url:s.url?publicCommerceUrl(s.url):null})),emails:extractBiographyEmails(p.biography??'').map(e=>e.email),updated_at:String(row.updated_at),reviewed:row.validation_status==='reviewed',evidence:c.classification_evidence.slice(0,8).map(e=>({category:e.category,keyword:e.keyword,excerpt:e.excerpt.slice(0,280)}))}];});
+ const categorySet=new Set(taxonomy.find(g=>g.name===f.category)?.children.map(c=>c.id)??[f.category]),q=normalize(f.q);
+ const filtered=records.filter(c=>(!q||normalize([c.username,c.display_name,c.biography,c.city,...c.categories].join(' ')).includes(q))&&(!f.category||c.categories.some(c=>categorySet.has(c)))&&(!f.country||c.country===f.country)&&(!f.gender||c.gender===f.gender)&&(!f.account||c.account_type===f.account)&&(!f.selling||c.selling_status===f.selling)&&(!f.channel||c.sales_channels.some(s=>s.channel===f.channel))&&(!f.followers||c.followers_count!==null&&(f.followers==='micro'?c.followers_count>=2000&&c.followers_count<=50000:f.followers==='medium'?c.followers_count>50000&&c.followers_count<=250000:c.followers_count>250000)));
+ filtered.sort((a,b)=>f.sort==='recent'?b.updated_at.localeCompare(a.updated_at)||b.id-a.id:a.followers_count===null?b.followers_count===null?b.id-a.id:1:b.followers_count===null?-1:(f.sort==='followers_desc'?b.followers_count-a.followers_count:a.followers_count-b.followers_count)||b.id-a.id);
+ const total=filtered.length,pageSize=12,pages=Math.max(1,Math.ceil(total/pageSize)),page=Math.min(f.page,pages);
+ return{creators:filtered.slice((page-1)*pageSize,page*pageSize),total,page,pages,page_size:pageSize,library:{profiles:records.length,countries:new Set(records.map(c=>c.country).filter(Boolean)).size,categories:new Set(records.flatMap(c=>c.categories)).size}};
+}
+export type PortalResponse=Awaited<ReturnType<typeof searchPortal>>;

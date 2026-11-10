@@ -9,6 +9,7 @@ Panel → yerel korumalı `/api/radar` → planlama → `ingestion_jobs` → tek
 Keşif, tarayıcı okuma, normalizasyon, saklama ve gösterim ayrıdır. İlk aday doğrulanınca profil işlenip kaydedilir; beşli grup dolması beklenmez. Sonraki kısıtlama tamamlanmış kaydı kaybettirmez.
 
 ## Başlıca modüller
+- `app/portal/*`, `lib/portal-search.ts`, `app/api/portal/route.ts`: yönetimden ayrı, izinli alan projeksiyonu ve salt okunur, sunucu filtreli müşteri arama önizlemesi.
 - `app/page.tsx`: panel durumu ve yenileme.
 - `app/research-panel.tsx`: hedefler, turlar, otomatik tarama, loglar.
 - `app/accounts-panel.tsx`, `app/creator-detail.tsx`: birleşik filtreler, satış/iletişim/kategori kanıtı, CSV, insan incelemesi.
@@ -20,6 +21,7 @@ Keşif, tarayıcı okuma, normalizasyon, saklama ve gösterim ayrıdır. İlk ad
 - `lib/discovery-run.ts`, `lib/discovery-store.ts`: sorgu/gönderi kuyruğu, owner önbelleği, yeni hesap önceliği.
 - `lib/discovery-frontier.ts`, `lib/query-budget.ts`: scope bazlı etiket geçmişi, hedefe uygun yeni kayıt verimi, keşif payı ve dinlenme.
 - `lib/instagram-browser.ts`, `lib/instagram-extract.ts`, `lib/instagram-post*.ts`: görünür sayfa okuma, kimlik/sahiplik doğrulama ve normalize veri.
+- `lib/request-recovery.ts`: bütçeli, iptal edilebilir HTTP yeniden denemeleri, ardışık istek sayacı ve devre açma.
 - `lib/instagram-restriction.ts`, `lib/instagram-state*.ts`, `lib/browser-session.ts`: HTTP kanıtı, Retry-After, kaynak kilidi ve oturum/araştırma ayrımı.
 - `lib/model.ts`: profil şeması ve sınıflandırma; `lib/context-classifier.ts`: zayıf kanıtta yerel kavram kuralları.
 - `lib/profile-context.ts`, `lib/language-country.ts`: açık konum + düşük güvenli dil tahmini.
@@ -31,7 +33,7 @@ Keşif, tarayıcı okuma, normalizasyon, saklama ve gösterim ayrıdır. İlk ad
 
 `ingestion_jobs` ve `logs`: yürütme; `research_runs`, `research_candidates`, `research_posts`: bütçeli checkpoint; `discovery_queries`, `discovery_results`: keşif; `discovery_frontier`, `discovery_observations`: kalıcı sorgu öğrenimi; `candidate_work`: keşif/iyileştirme ayrımı; `creator_evaluations`: model sürümüne göre insan değerlendirmesi; `continuous_scan`: tek kalıcı kontrol kaydı.
 
-SQLite şeması `lib/storage/sqlite.ts` içinde otomatik oluşturulur. PostgreSQL migration dosyaları `migrations/001...006` içindedir; uygulanmış dosyaları değiştirme. Yeni migration ekle. Yeni tabloyu transfer ve iki veri tabanı testlerine ekle.
+SQLite şeması `lib/storage/sqlite.ts` içinde otomatik oluşturulur. PostgreSQL migration dosyaları `migrations/001...008` içindedir; uygulanmış dosyaları değiştirme. Yeni migration ekle. Yeni tabloyu transfer ve iki veri tabanı testlerine ekle.
 
 ## Kritik ayrımlar
 - `category_match`: seçilen kategoriye uyum; `target_match`: konum/açık beyan; `research_match`: birleşik sonuç.
@@ -42,4 +44,9 @@ SQLite şeması `lib/storage/sqlite.ts` içinde otomatik oluşturulur. PostgreSQ
 - Puan, kalibre edilmiş olasılık değildir. Dil, cinsiyet, ikamet ve mağaza sahipliği birbirinin yerine kullanılmaz.
 
 ## Sürekli tarama
-Tek tek turların limitleri korunur. Seçilen hedefler sabit kalır; boş kategori/ülke desteklenen taksonomi/ülkeler arasında deterministik döner. Bu adaptif AI karar sistemi değildir. Kısıtlı veya durmuş iş kendiliğinden açılmaz. Generation alanı, tur oluşturma–durdurma–yeniden başlama yarışlarında eski işin yanlış sahiplenilmesini engeller. İş payload'ındaki `continuousGeneration` kesinti sonrası tur sahipliğini kurtarmaya yarar.
+Tek tek turların limitleri korunur. Seçilen hedefler sabit kalır; boş kategori/ülke desteklenen taksonomi/ülkeler arasında deterministik döner. Bu adaptif AI karar sistemi değildir. Kaynak kısıtlı işler kendiliğinden açılmaz; yalnız tanımlı teknik duruşlar sınırlı otomatik toparlanmaya uygundur. Generation alanı, tur oluşturma–durdurma–yeniden başlama yarışlarında eski işin yanlış sahiplenilmesini engeller. İş payload'ındaki `continuousGeneration` kesinti sonrası tur sahipliğini kurtarmaya yarar.
+
+`research_activity` yeni oturumlarda işleme/bekleme sürelerini ve kayıt sayaçlarının başlangıç/son değerlerini tutar. 2 sn heartbeat, 5 sn üstü boşluklarda ölçülemeyen zamanı ayırır. Eski turlara aktif süre uydurulmaz. Uzun ölçüm boşluğunda hız gösterilmez; kısmi ölçümde yalnız ölçülen yeni kayıt farkı kullanılır.
+Geriye uyum için `metrics.elapsed_seconds` duvar süresi olarak kalır. Saatlik hızın paydası `timing.active_seconds` (işleme + zorunlu bekleme) olur; `timing.working_seconds` yalnız işleme süresidir. Kısmi ölçümde eski kayıt sayısı saatlik hıza eklenmez. Ölçülemeyen uzun aralık varsa hız null döner.
+
+`lib/continuous-recovery.ts`: generation/sahiplik kontrolüyle, PostgreSQL yazma kilidi ve tek transaction içinde sınırlı teknik devam. `lib/technical-recovery.ts`: sağlayıcı katmanından ayrı kalıcı teknik adres karantinası. `research_quarantine` transfer ve RLS kapsamındadır.

@@ -1,0 +1,3 @@
+import {test} from 'node:test';import {mkdtempSync} from 'node:fs';import {join} from 'node:path';import {tmpdir} from 'node:os';
+const dir=mkdtempSync(join(tmpdir(),'radar-resilience-'));process.env.RADAR_DB=join(dir,'singleton.sqlite');process.env.RADAR_STORAGE='sqlite';process.env.INSTAGRAM_STATE_FILE=join(dir,'state.json');
+test('technical recovery is bounded, preserves budgets and respects stop and source restrictions',async()=>{const {SQLiteDatabase}=await import('../lib/storage/sqlite'),{CreatorStore}=await import('../lib/db'),{resilienceContract}=await import('./continuous-resilience-contract');const db=new SQLiteDatabase(join(dir,'test.sqlite'));try{await resilienceContract(new CreatorStore(db));}finally{await db.close();}});

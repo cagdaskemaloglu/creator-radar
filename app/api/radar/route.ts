@@ -1,5 +1,6 @@
+import {TechnicalQuarantine} from '../../../lib/technical-recovery';
 import {scanStatus,startScan,stopScan} from '../../../lib/continuous-scan';
-import {assertServerWaitElapsed} from '../../../lib/instagram-state';
+import {assertServerWaitElapsed,resumeInstagram} from '../../../lib/instagram-state';
 import {carryResearchPool} from '../../../lib/research-continuation';
 import {evaluateCreator,evaluationSummary,improvementQueue,accessSummary} from '../../../lib/research-operations';
 import {isolateLegacyTagFailure} from '../../../lib/tag-recovery';
@@ -30,7 +31,7 @@ export async function GET(req: NextRequest) {
     const snapshot=await store.snapshot(),runs=await new NightStore(store).reports();
     const selected=req.nextUrl.searchParams.get('log_job_id');const logId=selected?safeId(selected):runs[0]?.job_id;
     const researchLogs=logId?await all(store.database,'SELECT id,job_id,message,created_at FROM logs WHERE job_id=$1 ORDER BY id DESC LIMIT 200',[safeId(logId)]):[];
-    return NextResponse.json({ ...snapshot,continuousScan:await scanStatus(store),researchLogs,evaluations:await evaluationSummary(store),improvements:{pending:(await improvementQueue(store,[],{})).length},access:await accessSummary(store,readResearchState(),readBrowserSession().checked_at),tagPerformance:await new DiscoveryStore(store).keywordPerformance(),worker:readWorkerStatus(),limits:researchLimits(),defaults:autonomousPlan({}), researchBrowser:{channel:browserPreferences().channel,headless:true,session:readBrowserSession()}, googleDiscovery: readGoogleState(), nightRuns:runs, storage: store.database.dialect, instagram: { ...readResearchState(), enabled: process.env.INSTAGRAM_BROWSER_ENABLED !== 'false' } }, { headers: { 'Cache-Control': 'no-store' } });
+    return NextResponse.json({ ...snapshot,technicalQuarantine:{active:await new TechnicalQuarantine(store).summary()},continuousScan:await scanStatus(store),researchLogs,evaluations:await evaluationSummary(store),improvements:{pending:(await improvementQueue(store,[],{})).length},access:await accessSummary(store,readResearchState(),readBrowserSession().checked_at),tagPerformance:await new DiscoveryStore(store).keywordPerformance(),worker:readWorkerStatus(),limits:researchLimits(),defaults:autonomousPlan({}), researchBrowser:{channel:browserPreferences().channel,headless:true,session:readBrowserSession()}, googleDiscovery: readGoogleState(), nightRuns:runs, storage: store.database.dialect, instagram: { ...readResearchState(), enabled: process.env.INSTAGRAM_BROWSER_ENABLED !== 'false' } }, { headers: { 'Cache-Control': 'no-store' } });
   } catch {
     return NextResponse.json({ error: 'Veritabanına erişilemiyor. Bağlantı ve migration durumunu kontrol et.' }, { status: 503 });
   }
@@ -53,6 +54,7 @@ export async function POST(req: NextRequest) {
       const prior=await new NightStore(store).run(safeId(body.id));if(Date.now()>=Date.parse(String(prior.started_at))+prior.settings.hours*3600000||Number(prior.page_requests)>=prior.settings.maxPages)throw Error('Bu turun süresi veya sayfa bütçesi dolmuş. Kalan havuzla yeni tur başlat.');
       await isolateLegacyProfileFailure(safeId(body.id),store);
       await isolateLegacyTagFailure(safeId(body.id),store);
+      if(prior.stop_reason==='post_access_deferred'&&!readResearchState().paused)resumeInstagram();
       if (readResearchState().paused) throw new Error('Önce araştırma tarayıcısını kontrol edip kaynak kilidini kaldır.');
       const night=new NightStore(store);const run=await night.run(safeId(body.id));
       if(run.settings.discovery?.enabled&&run.settings.discovery.providers.includes('google')&&readGoogleState().paused)throw new Error('Önce Google keşif tarayıcısını kontrol edip kaynak kilidini kaldır.');

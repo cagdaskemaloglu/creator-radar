@@ -4,6 +4,8 @@ import { dirname, resolve } from 'node:path';
 import type { Database, Executor, Param, QueryResult } from './driver';
 
 export const SQLITE_SCHEMA = `
+CREATE TABLE IF NOT EXISTS research_quarantine(kind TEXT NOT NULL CHECK(kind IN ('profile','post','tag')),url TEXT NOT NULL,reason TEXT NOT NULL,last_seen_at TEXT NOT NULL,expires_at TEXT NOT NULL,PRIMARY KEY(kind,url));
+CREATE INDEX IF NOT EXISTS research_quarantine_expiry ON research_quarantine(expires_at);
 CREATE TABLE IF NOT EXISTS continuous_scan(id INTEGER PRIMARY KEY CHECK(id=1),enabled INTEGER NOT NULL DEFAULT 0,generation INTEGER NOT NULL DEFAULT 0,config TEXT NOT NULL DEFAULT '{}',cycle INTEGER NOT NULL DEFAULT 0,job_id INTEGER REFERENCES ingestion_jobs(id),next_at TEXT,status TEXT NOT NULL DEFAULT 'stopped',message TEXT,updated_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS creators(id INTEGER PRIMARY KEY,username TEXT UNIQUE NOT NULL,instagram_user_id TEXT UNIQUE,profile_url TEXT NOT NULL,payload TEXT NOT NULL,validation_status TEXT NOT NULL,created_at TEXT NOT NULL,updated_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS creator_sources(id INTEGER PRIMARY KEY,creator_id INTEGER NOT NULL REFERENCES creators(id) ON DELETE CASCADE,provider TEXT NOT NULL,source_identifier TEXT NOT NULL,permission_reference TEXT NOT NULL,collected_at TEXT NOT NULL);
@@ -11,6 +13,8 @@ CREATE TABLE IF NOT EXISTS creator_metrics(id INTEGER PRIMARY KEY,creator_id INT
 CREATE TABLE IF NOT EXISTS suppressions(username TEXT PRIMARY KEY,instagram_user_id TEXT);
 CREATE TABLE IF NOT EXISTS ingestion_jobs(id INTEGER PRIMARY KEY,kind TEXT NOT NULL,payload TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'queued',processed INTEGER DEFAULT 0,inserted INTEGER DEFAULT 0,updated INTEGER DEFAULT 0,cancel_requested INTEGER DEFAULT 0,created_at TEXT NOT NULL,completed_at TEXT,error TEXT);
 CREATE TABLE IF NOT EXISTS logs(id INTEGER PRIMARY KEY,job_id INTEGER REFERENCES ingestion_jobs(id),message TEXT NOT NULL,created_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS research_activity(id INTEGER PRIMARY KEY,job_id INTEGER NOT NULL REFERENCES ingestion_jobs(id),started_at TEXT NOT NULL,last_seen_at TEXT NOT NULL,ended_at TEXT,active_ms INTEGER NOT NULL DEFAULT 0,wait_ms INTEGER NOT NULL DEFAULT 0,unobserved_ms INTEGER NOT NULL DEFAULT 0,start_inserted INTEGER NOT NULL,end_inserted INTEGER NOT NULL,start_saved INTEGER NOT NULL,end_saved INTEGER NOT NULL);
+CREATE INDEX IF NOT EXISTS research_activity_job ON research_activity(job_id,id);
 CREATE TABLE IF NOT EXISTS research_runs(job_id INTEGER PRIMARY KEY REFERENCES ingestion_jobs(id),settings TEXT NOT NULL,page_requests INTEGER NOT NULL DEFAULT 0,started_at TEXT NOT NULL,finished_at TEXT,stop_reason TEXT);
 CREATE TABLE IF NOT EXISTS research_candidates(id INTEGER PRIMARY KEY,job_id INTEGER NOT NULL REFERENCES research_runs(job_id),url TEXT NOT NULL,depth INTEGER NOT NULL DEFAULT 0,status TEXT NOT NULL DEFAULT 'pending',attempts INTEGER NOT NULL DEFAULT 0,profile_data TEXT,outcome TEXT,category TEXT,fit_score INTEGER,reason TEXT,created_at TEXT NOT NULL,updated_at TEXT NOT NULL,UNIQUE(job_id,url));
 CREATE TABLE IF NOT EXISTS research_posts(id INTEGER PRIMARY KEY,candidate_id INTEGER NOT NULL REFERENCES research_candidates(id),url TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'pending',attempts INTEGER NOT NULL DEFAULT 0,evidence TEXT,reason TEXT,UNIQUE(candidate_id,url));
