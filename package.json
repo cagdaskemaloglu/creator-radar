@@ -2,6 +2,9 @@
   "name": "creator-radar",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22.13"
+  },
   "scripts": {
     "dev": "next dev --webpack --hostname 127.0.0.1",
     "build": "next build --webpack",
@@ -9,6 +12,7 @@
     "worker": "node --env-file-if-exists=.env --import tsx scripts/worker.ts",
     "test": "node --import tsx --test tests/*.test.ts",
     "typecheck": "tsc --noEmit",
+    "validate": "npm run typecheck && npm test",
     "browser:install": "playwright install chromium",
     "test:smoke": "node --import tsx scripts/smoke.ts",
     "db:migrate": "node --env-file-if-exists=.env --import tsx scripts/db-migrate.ts",

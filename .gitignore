@@ -6,12 +6,17 @@ data/*
 !data/.gitkeep
 browser-profile/
 *.tsbuildinfo
-
 .next-validation/
-
-# Preserved local build cache from relocation
 .next-before-relocation-*/
+.DS_Store
 
-# Database snapshot awaits a decision on the public repository's visibility.
+# Veritabanı kopyası public repoya gitmez
 shared-data/*.sqlite
 shared-data/*.tmp
+
+# Projeyle ilgisiz çıktılar
+/outputs/
+/tmp/
+/output/pdf/
+*.blend
+*.blend1

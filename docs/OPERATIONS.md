@@ -55,11 +55,4 @@ uygulamak için Hesapları keşfet düğmesine bas. Ülke tahmini kartta ayrıca
 URL arama ayarlarını taşır. İnternete yayın veya müşteri üyelik/yetkisi bu yerel
 önizlemenin parçası değildir; admin erişimini bir menü görünümüyle sınırlandırma.
 
-## 2026-11-10 — Sürekli taramada teknik toparlanma
-Yalnız sürekli taramanın sahip olduğu turlarda, ardışık ağ/profil düzeni/etiket okuma hatalarında kontrollü devam vardır. İlk toparlanma 2 dakika, ikinci 5 dakika sonra; tur başına en fazla iki kez. Aynı iş/kuyruk, başlangıç zamanı ve sayfa bütçesi korunur. Tükenen süre/bütçede eski tur kapatılıp yeni tura geçilir; bekleyen havuz devam mekanizmasına bırakılır. Kullanıcı durdurması ve eşzamanlı başka araştırma önceliklidir.
-
-`research_quarantine` (PostgreSQL migration 008) teknik sorunlu profil/gönderi/etiket adreslerini ağ hatasında 30 dakika, düzen okunamamasında 2 saat ayırır. Gönderinin /p/ ve /reel/ biçimleri aynı kimliğe bağlanır. Süresi dolmuş adres sonraki keşifte yeniden değerlendirilebilir; eski turdaki skipped kayıtlar kendiliğinden pending yapılmaz. Diğer adaylar ziyaret edilip kaydedilebilir. Panel toparlanma nedenini, planlanan devam saatini ve etkin geçici adres sayısını gösterir.
-
-403/429 kaynak kilidi, sunucu bekleme süresi, CAPTCHA, giriş gereksinimi, kimlik çelişkisi, `post_access_deferred` ve tanınmayan hatalar bu toparlanmayla açılmaz. Mevcut HTTP yeniden deneme politikası ayrı kalır. Kapalı sürekli tarama kendiliğinden etkinleştirilmez; manuel araştırmalar otomatik devam kapsamına alınmaz.
-
-Bu güncellemenin doğrulaması: 134 birim/kontrat testi, 22 PostgreSQL testi, tip kontrolü, üretim derlemesi ve SQLite/PostgreSQL panel smoke testleri geçti. Testler canlı Instagram trafiği üretmedi. Teknik adreslerin ziyaret öncesi atlanması, sağlıklı adayın kaydı, iki toparlanma sınırı, bütçe korunması, kullanıcı durdurması ve kaynak kilidinin önceliği doğrulandı.
+Sürekli taramadaki teknik toparlanma ve adres karantinası ayrıntıları için `docs/STATUS.md` (2026-11-10) ve `docs/ARCHITECTURE.md` dosyalarına bak.

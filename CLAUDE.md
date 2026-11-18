@@ -10,6 +10,7 @@ Bu dosya Claude ve diğer kodlama asistanları için giriş noktasıdır. Kullan
 5. `docs/ROADMAP.md` — öncelikli yapılacaklar.
 6. `docs/OPERATIONS.md` — başlatma, test, veri ve oturum koruma.
 7. `docs/DECISIONS.md` — önceki kararların nedenleri.
+8. `docs/FEATURES.md` — özellik davranışlarının ayrıntıları (yalnız gerektiğinde).
 
 Kanonik konum: `/Users/cagdas/creator-radar`. Paket adı `creator-radar`.
 Panel: http://127.0.0.1:3000/. Veri, `.env` ve Chromium oturumu bu bilgisayarda kalır.
@@ -30,12 +31,8 @@ Eski konum uyumluluk için sembolik bağlantı olabilir; ikinci bir proje/verita
 
 Son dokümantasyon tarihi: 2026-11-08. Gerçek uygulama ve test sonuçları her zaman belgelerden daha güncel olabilir.
 
-## 2026-11-10 — Sürekli taramada teknik toparlanma
-Yalnız sürekli taramanın sahip olduğu turlarda, ardışık ağ/profil düzeni/etiket okuma hatalarında kontrollü devam vardır. İlk toparlanma 2 dakika, ikinci 5 dakika sonra; tur başına en fazla iki kez. Aynı iş/kuyruk, başlangıç zamanı ve sayfa bütçesi korunur. Tükenen süre/bütçede eski tur kapatılıp yeni tura geçilir; bekleyen havuz devam mekanizmasına bırakılır. Kullanıcı durdurması ve eşzamanlı başka araştırma önceliklidir.
-
-`research_quarantine` (PostgreSQL migration 008) teknik sorunlu profil/gönderi/etiket adreslerini ağ hatasında 30 dakika, düzen okunamamasında 2 saat ayırır. Gönderinin /p/ ve /reel/ biçimleri aynı kimliğe bağlanır. Süresi dolmuş adres sonraki keşifte yeniden değerlendirilebilir; eski turdaki skipped kayıtlar kendiliğinden pending yapılmaz. Diğer adaylar ziyaret edilip kaydedilebilir. Panel toparlanma nedenini, planlanan devam saatini ve etkin geçici adres sayısını gösterir.
-
-403/429 kaynak kilidi, sunucu bekleme süresi, CAPTCHA, giriş gereksinimi, kimlik çelişkisi, `post_access_deferred` ve tanınmayan hatalar bu toparlanmayla açılmaz. Mevcut HTTP yeniden deneme politikası ayrı kalır. Kapalı sürekli tarama kendiliğinden etkinleştirilmez; manuel araştırmalar otomatik devam kapsamına alınmaz.
+## Değişiklik günlüğü
+Tarih sıralı güncellemeler `docs/STATUS.md` içindedir; özellik ayrıntıları `docs/FEATURES.md` içindedir. Aynı metni burada tekrarlama.
 
 ## Veritabanı paylaşımı — kullanıcı isteği
 Kullanıcı veritabanının repo üzerinden paylaşılmasını istedi. `shared-data/` altında 882 creator içeren anlık kopya ve hazırlama/geri yükleme komutları hazırlandı. GitHub deposu public olduğu anlaşıldığından dışarı gönderme henüz yapılmadı; kullanıcının public paylaşım veya repo görünürlüğü kararını bekle. Kopya şu an `.gitignore` ile korunur. Kaynak `data/radar.sqlite`, `.env` ve Chromium dosyaları her durumda Git dışında kalır. `shared-data/README.md` dosyasını oku.
