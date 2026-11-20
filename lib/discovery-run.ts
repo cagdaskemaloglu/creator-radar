@@ -3,6 +3,7 @@ import {RequestRecovery,RequestSkipped} from './request-recovery';
 import {logRestriction} from './instagram-restriction';
 import {queryBudgetShares} from './query-budget';
 import {InstagramPostRouteError} from './instagram-post-policy';
+import {isTransientTransportError} from './transient-error';
 import {DiscoveryFrontier} from './discovery-frontier';
 import {InstagramTagReadError} from './tag-read-policy';
 import {relatedDiscoveryKeywords} from './discovery-expansion';
@@ -146,7 +147,7 @@ export async function runDiscovery(job:number,settings:DiscoverySettings,store:C
    if(e instanceof RequestSkipped){await repo.skipRecent(id,null,e.message);continue;}
    const message=e instanceof Error?e.message.split('\n')[0]:'';
    if(!signal.aborted&&e instanceof InstagramPostRouteError){await repo.skipRecent(id,null,'unsupported_post_route');await store.log(job,`Post owner failed: unsupported_post_route; ${url}`);continue;}
-   if(!signal.aborted&&!(e instanceof InstagramStop)&&/net::ERR_(CONNECTION_CLOSED|CONNECTION_RESET|CONNECTION_TIMED_OUT|NETWORK_CHANGED)\b|(?:page\.goto|navigation).*Timeout|Timeout.*(?:page\.goto|navigation)/i.test(message)){
+   if(!signal.aborted&&!(e instanceof InstagramStop)&&(isTransientTransportError(e)||/(?:page\.goto|navigation).*Timeout|Timeout.*(?:page\.goto|navigation)/i.test(message))){
     await quarantine.add('post',url,'network_error',now());await repo.skipRecent(id,null,'page_not_loaded');await store.log(job,`Post owner failed: page_not_loaded; ${url}`);
     await store.log(job,`Discovery transport error; post skipped without retry: ${url}`);
     if(++consecutiveTransportErrors>=3){await store.log(job,'Three consecutive transport errors; discovery deferred, verified candidates retained for processing');return{deferred:true};}

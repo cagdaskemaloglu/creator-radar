@@ -3,6 +3,7 @@ import {ResearchActivity} from './research-activity';
 import {RequestRecovery,RequestSkipped} from './request-recovery';
 import {logRestriction} from './instagram-restriction';
 import {InstagramPostRouteError} from './instagram-post-policy';
+import {isTransientTransportError} from './transient-error';
 import {needsSelectiveReview} from './selective-review';
 import {DiscoveryFrontier} from './discovery-frontier';
 import {expandDiscoveryPool} from './discovery-expansion';
@@ -184,7 +185,7 @@ export async function researchNight(job: number, request: NightRequest, store: C
           pauseInstagram(error.message,error.restriction);if(error.restriction)await logRestriction(store,job,error.restriction);
           if(activePost) await night.postResult(activePost,'blocked',null,error.reason);
           if(profile) await finalize(id,url,profile,'post_access_blocked; base profile saved');
-        } else if(!signal.aborted&&error instanceof Error&&/net::ERR_(CONNECTION_CLOSED|CONNECTION_RESET|CONNECTION_TIMED_OUT|NETWORK_CHANGED)\b/.test(error.message)){
+        } else if(!signal.aborted&&isTransientTransportError(error)){
           if(activePost){const failed=(await night.posts(id)).find(p=>Number(p.id)===activePost);if(failed)await quarantine.add('post',String(failed.url),'network_error',now());await night.postResult(activePost,'skipped',null,'network_error_no_retry');}else if(!profile)await quarantine.add('profile',url,'network_error',now());
           if(profile)await finalize(id,url,profile,'caption_network_error; available evidence saved');
           else await night.skip(id,'profile_network_error_no_retry');

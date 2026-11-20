@@ -139,7 +139,9 @@ Satış sinyalleri içerik kategorilerinden ve ikametten bağımsızdır. Profil
 
 ## Sınırlı HTTP yeniden deneme politikası — 2026-11-09
 
-Arka plan gece araştırması ve keşif katmanında ölçülen HTTP 403/429 için ilk sorunlu istek toplam üç defa denenir (ilk deneme dahil). Denemeler arasında en az 120 saniye + normal ziyaret beklemesi vardır; sunucu daha uzun Retry-After bildirirse daha uzun süre korunur. Üç deneme de başarısızsa istek atlanır. Sonraki istekte aynı HTTP kodu gelirse ek üçlü döngü yapılmaz, o istek de atlanır. Üçüncü ardışık başarısız istekte kaynak ve tur durur; otomatik kilit kaldırılmaz. Başarılı okuma yalnız kendi fazının (etiket/gönderi/profil) serisini sıfırlar.
+**2026-11-19 güncellemesi:** HTTP 429 bu politikanın dışındadır. 429 adres bazlı değil istemci bazlı bir limittir; bu yüzden aynı adres yeniden denenmez ve başka adrese geçilmez. İlk 429'da tur duraklatılır, havuz korunur, sunucu bekleme süresi bildirildiyse `retryNotBefore` olarak saklanır. Aşağıdaki üçlü deneme politikası yalnız HTTP 403 için geçerlidir.
+
+Arka plan gece araştırması ve keşif katmanında ölçülen HTTP 403 için ilk sorunlu istek toplam üç defa denenir (ilk deneme dahil). Denemeler arasında en az 120 saniye + normal ziyaret beklemesi vardır; sunucu daha uzun Retry-After bildirirse daha uzun süre korunur. Üç deneme de başarısızsa istek atlanır. Sonraki istekte aynı HTTP kodu gelirse ek üçlü döngü yapılmaz, o istek de atlanır. Üçüncü ardışık başarısız istekte kaynak ve tur durur; otomatik kilit kaldırılmaz. Başarılı okuma yalnız kendi fazının (etiket/gönderi/profil) serisini sıfırlar.
 
 `lib/request-recovery.ts` bu politikayı profil, creator açıklaması, etiket ve gönderi sahibi okumalarında uygular. Her tekrar normal rezervasyon üzerinden sayfa/günlük/iyileştirme bütçesinden düşer; süre ve iptal kontrolü korunur. Başarısız caption yüzünden alınmış temel profil kaybolmaz. Deneme ve hata sayacı yerel state dosyasında kalır; kesintide ilk istek tekrar sınırsız başlatılmaz.
 
@@ -183,3 +185,6 @@ ve kapalı süre eklenmez. Eski turlarda ölçüm yoksa hız null/— olur. Kıs
 eski kayıtları paya eklemez; uzun ölçüm boşluğunda hız gizlenir. Tur durum kodları
 korunur, kullanıcıya `completion_label` ile kayıtlı/bütçe bitti ama kayıtsız sonuç
 ayrı gösterilir.
+
+## Zorunlu soğuma (HTTP 429 sonrası)
+İlk HTTP 429'da tur duraklatılır ve zorunlu soğuma başlar: son 72 saatteki 1. olayda 24 saat, 2. olayda 48 saat, 3. ve sonraki olaylarda 72 saat. Aynı olayın bir dakika içindeki tekrar bildirimi tek sayılır. Soğuma bitmeden yeni araştırma, sürekli tarama, tur devamı, oturum kontrolü, manuel Chromium açma/gezinme ve "durdurmayı kaldır" işlemleri reddedilir; panel bitiş zamanını ve son 72 saatteki olay sayısını gösterir. Operatör "Soğumayı bilerek geçersiz kıl" düğmesiyle (onay penceresi ve API'de `confirm: true` gerekir) yalnız bu soğumayı kaldırabilir; durdurma kilidini ayrıca elle kaldırması gerekir. Sunucunun bildirdiği bekleme süresi (`retryNotBefore`) geçersiz kılınamaz. Geçersiz kılmalar durum dosyasında (`cooldownOverrides`) kayıtlıdır. 403 ve diğer kapılar bu soğumayı başlatmaz.

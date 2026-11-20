@@ -13,6 +13,7 @@ import { WorkerInterrupted } from '../lib/job-control';
 import { readGoogleState,writeGoogleState,resumeGoogle } from '../lib/google-state';
 import { writeResearchState,readResearchState } from '../lib/instagram-state';
 import { first } from '../lib/storage/driver';
+import { TransientHttpError,isTransientTransportError } from '../lib/transient-error';
 const dir=mkdtempSync(join(tmpdir(),'radar-discovery-'));
 process.env.RADAR_STORAGE='sqlite';process.env.RADAR_DB=join(dir,'singleton.sqlite');process.env.GOOGLE_DISCOVERY_STATE_FILE=join(dir,'google.json');process.env.INSTAGRAM_STATE_FILE=join(dir,'ig.json');
 const profile='https://www.instagram.com/synthetic_discovered/',post='https://www.instagram.com/p/SyntheticDiscovery/';
@@ -157,4 +158,18 @@ test('seedless input must supply a real topic or keyword, and cannot contain sea
  const s=await setup('validation');
  try{const {enqueue}=await import('../lib/job-input');await assert.rejects(enqueue({kind:'instagram_night',source:'test',permission:'synthetic validation',content:'',discoveryEnabled:false},s.store));await assert.rejects(enqueue({kind:'instagram_night',source:'test',permission:'synthetic validation',content:'',discoveryEnabled:true,discoveryKeywords:['site:evil.org']},s.store));}
  finally{await s.db.close();}
+});
+test('HTTP 5xx is a transient failure, never a source restriction',async()=>{
+ assert.equal(isTransientTransportError(new TransientHttpError(500)),true);
+ assert.equal(isTransientTransportError(new Error('page.goto: net::ERR_CONNECTION_CLOSED at https://www.instagram.com/p/X/')),true);
+ assert.equal(isTransientTransportError(new Error('HTTP 429')),false);
+ assert.equal(isTransientTransportError(new InstagramStop('rate-limit','HTTP 429')),false);
+ assert.equal(isTransientTransportError(new Error('Record suppressed')),false);
+ const s=await setup('transient-5xx');let calls=0;
+ try{
+  await researchNight(s.id,s.request,s.store,new AbortController().signal,{...s.clock,profile:s.read,discovery:{...s.clock,search:async q=>({sourceUrl:q.url,links:[1,2,3,4].map(n=>({url:`https://www.instagram.com/p/Transient${n}/`,kind:'post' as const,title:''}))}),author:async()=>{calls++;throw new TransientHttpError(500);}}});
+  assert.equal(calls,3);assert.notEqual(readResearchState().paused,true);
+  const report=(await new NightStore(s.store).reports())[0];assert.equal(report.stop_reason,'discovery_deferred');
+  assert.notEqual((await s.store.snapshot()).jobs[0].status,'paused');
+ }finally{await s.db.close();}
 });

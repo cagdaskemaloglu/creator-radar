@@ -1,6 +1,6 @@
 import {TechnicalQuarantine} from '../../../lib/technical-recovery';
 import {scanStatus,startScan,stopScan} from '../../../lib/continuous-scan';
-import {assertServerWaitElapsed,resumeInstagram} from '../../../lib/instagram-state';
+import {assertAccessWindow,overrideCooldown,resumeInstagram} from '../../../lib/instagram-state';
 import {carryResearchPool} from '../../../lib/research-continuation';
 import {evaluateCreator,evaluationSummary,improvementQueue,accessSummary} from '../../../lib/research-operations';
 import {isolateLegacyTagFailure} from '../../../lib/tag-recovery';
@@ -60,10 +60,11 @@ export async function POST(req: NextRequest) {
       if(run.settings.discovery?.enabled&&run.settings.discovery.providers.includes('google')&&readGoogleState().paused)throw new Error('Önce Google keşif tarayıcısını kontrol edip kaynak kilidini kaldır.');
       await night.resume(safeId(body.id));await ensureWorkerRunning();
     }
+    else if(body.action==='override_cooldown'){if(body.confirm!==true)throw new Error('Soğumayı geçersiz kılmak için açık onay gerekir.');overrideCooldown();}
     else if (body.action === 'cancel') await store.cancel(safeId(body.id));
     else if (body.action === 'review') await store.review(safeId(body.id), body.status);
     else if (body.action === 'suppress') await store.suppress(safeId(body.id));
-    else {if(['instagram_resume','browser_check_session','browser_open','browser_navigate'].includes(body.kind))assertServerWaitElapsed();const id=await enqueue(body);if(['browser_open','browser_close','browser_check_session','instagram_resume'].includes(body.kind))await ensureWorkerRunning();return NextResponse.json({ id });}
+    else {if(['instagram_resume','browser_check_session','browser_open','browser_navigate'].includes(body.kind))assertAccessWindow();const id=await enqueue(body);if(['browser_open','browser_close','browser_check_session','instagram_resume'].includes(body.kind))await ensureWorkerRunning();return NextResponse.json({ id });}
     return NextResponse.json({ ok: true });
   } catch (error) {
     // Connection/SQL errors must never expose connection strings or server internals.

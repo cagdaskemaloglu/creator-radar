@@ -1,6 +1,7 @@
 import {responseRestriction} from './instagram-restriction';
-import {recordResearchSuccess,assertServerWaitElapsed} from './instagram-state';
+import {recordResearchSuccess,assertAccessWindow} from './instagram-state';
 import {InstagramTagReadError} from './tag-read-policy';
+import { TransientHttpError } from './transient-error';
 import {normalizeDiscoveryLink} from './discovery-plan';
 import {collectTagLinks,type TagCollectionOptions} from './tag-collection';
 import type { BrowserContext, Page } from 'playwright';
@@ -82,7 +83,7 @@ export async function snapshotInstagramPage(page: Page): Promise<InstagramSnapsh
   });
 }
 export async function readInstagramDocument(url: string, signal: AbortSignal, suppliedContext?: BrowserContext, waitForBiography: boolean | 'discovery' | 'post-author' = true,tagCollection?:TagCollectionOptions) {
-  if(!suppliedContext)assertServerWaitElapsed();
+  if(!suppliedContext)assertAccessWindow();
   const context = suppliedContext ?? await launchBrowser();
   const page = await context.newPage();
   let restriction: InstagramStop | undefined;
@@ -99,6 +100,7 @@ export async function readInstagramDocument(url: string, signal: AbortSignal, su
     if (response?.status() === 401) throw new InstagramStop('login', 'HTTP 401; manual login required');
     if (!response){if(waitForBiography==='discovery')throw new InstagramTagReadError('tag_load_failed','Tag page response unavailable');throw new InstagramStop('layout', 'Page response unavailable');}
     if (response.status() === 404) return { status: 'unavailable' as const, snapshot: null };
+    if (response.status() >= 500) { if (waitForBiography === 'discovery') throw new InstagramTagReadError('tag_load_failed', 'Tag page HTTP ' + response.status()); throw new TransientHttpError(response.status()); }
     if (!response.ok()) throw new InstagramStop('access-denied', 'Source returned HTTP ' + response.status());
     // Read visible public UI only; extra tag loads require the caller’s budget reservation.
     await page.locator('main,[role="main"],input[type="password"],iframe[src*="captcha"]').first().waitFor({ state: 'visible', timeout: 5000 }).catch(() => {});

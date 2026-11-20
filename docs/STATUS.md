@@ -54,3 +54,13 @@ Bu güncellemenin doğrulaması: 134 birim/kontrat testi, 22 PostgreSQL testi, t
 
 ## 2026-11-18 — Depo ve belge temizliği
 Kod davranışı değişmedi. İlgisiz çalışma çıktıları (`outputs/` 3B modeller, `output/pdf`, `tmp/`) depodan çıkarıldı ve `.gitignore` kapsamına alındı; denetim JSON'ları `docs/audits/` altına taşındı. README kurulum ve günlük kullanım odağına indirildi, ayrıntılı davranış notları `docs/FEATURES.md` dosyasına taşındı (altı İngilizce paragraf Türkçeleştirildi, yanlış başlıklardan ayrıldı). Dört dosyada yinelenen 2026-11-10 bölümü tek yere (bu dosya) indirildi. `package.json` içine `engines` (Node >=22.13) ve `validate` betiği eklendi. Taban doğrulama: tip kontrolü temiz, 134/134 birim testi geçti.
+
+## 2026-11-19 — Güvenilirlik Faz 1: geçici hatalar
+HTTP 5xx yanıtı artık kaynak kısıtı (`access-denied`) sayılıp turu duraklatmıyor; `lib/transient-error.ts` içindeki ortak sınıflandırma ile bağlantı kopmaları gibi geçici hata olarak işleniyor: adres karantinaya alınır, tur sürer (etiket sayfalarında `tag_load_failed`). 403/429 davranışı değişmedi. Tespit: gerçek çalışma verisinde 112 turun 3'ü geçici hatalarla (5xx, bağlantı kopması, desteklenmeyen adres) gereksiz durmuştu; bağlantı kopması ve desteklenmeyen adres yolları kodda zaten ele alınıyordu, açık olan 5xx'ti. Doğrulama: tip kontrolü temiz, 135/135 test geçti.
+
+## 2026-11-19 — Güvenilirlik Faz 2: 429'da hemen dur
+`lib/request-recovery.ts` HTTP 429'u artık yeniden denemiyor ve başka adrese geçmiyor; ilk 429'da kısıt kaydedilir ve tur duraklatılır. Önceki davranış bir 429 olayında 5 istek üretiyordu (aynı adrese 3 deneme, ardından iki adreste birer deneme). Üçlü deneme politikası yalnız 403 için sürer. Bu politikayı kilitleyen sekiz test 403'e çevrildi (devre-kesici kapsamı korunur) ve 429 için iki yeni test eklendi (tek istekle duraklatma, sunucu beklemesinin korunması). Doğrulama: tip kontrolü temiz, 137/137 test geçti.
+
+## 2026-11-19 — Güvenilirlik Faz 3: zorunlu soğuma
+HTTP 429 sonrası kademeli soğuma eklendi (24/48/72 saat, 72 saatlik pencerede olay sayısına göre). `readResearchState` soğuma sürerken `paused: true` döndürdüğü için araştırma, sürekli tarama ve tur devamı mevcut korumalarla engellenir; Instagram'a istek gönderen işlemler (oturum kontrolü, manuel pencere, durdurmayı kaldırma, sayfa okuma) `assertAccessWindow` ile denetlenir. Operatör panelden açık onayla soğumayı geçersiz kılabilir (`override_cooldown`); sunucu `Retry-After` süresi geçersiz kılınamaz. Dayanak: 18 Kasım olayında ~10 saat sonra yeniden başlatma ilk istekte 429 aldı. Testler: 3 yeni test (kademe, engelleme ve geçersiz kılma, panel özeti); iki eski sözleşme gerçek akışa göre güncellendi. Doğrulama: tip kontrolü temiz, 140/140 test geçti.
+

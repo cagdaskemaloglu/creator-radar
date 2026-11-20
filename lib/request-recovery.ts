@@ -17,7 +17,10 @@ export class RequestRecovery{
    catch(error){
     this.signal.throwIfAborted();
     if(!(error instanceof InstagramStop)||!error.restriction||/\/(?:challenge|checkpoint|accounts)\//i.test(error.restriction.url))throw error;
-    const detail=error.restriction,key='HTTP '+detail.status,state=readResearchState(this.now()),previous=scoped(state);
+    const detail=error.restriction;
+    // HTTP 429 is a client-wide rate limit, not a property of one URL: never retry it or hop to another address.
+    if(detail.status===429){await logRestriction(this.store,this.job,detail);await this.store.log(this.job,`HTTP 429 [${phase}]: yeniden deneme ve başka adrese geçme yapılmadı; tur duraklatılıyor; ${url}`);throw error;}
+    const key='HTTP '+detail.status,state=readResearchState(this.now()),previous=scoped(state);
     const failed=previous?.code===key?previous.failed:0;
     attempts++;
     await logRestriction(this.store,this.job,detail);

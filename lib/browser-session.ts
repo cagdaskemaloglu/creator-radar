@@ -1,5 +1,5 @@
 import {responseRestriction,type HttpRestriction} from './instagram-restriction';
-import {assertServerWaitElapsed} from './instagram-state';
+import {assertAccessWindow} from './instagram-state';
 import type { BrowserContext } from 'playwright';
 import { existsSync,readFileSync,writeFileSync,mkdirSync } from 'node:fs';
 import { resolve,dirname } from 'node:path';
@@ -12,7 +12,7 @@ export function readBrowserSession():SessionStatus{
  return{status:'unverified',checked_at:null,scope:'session_only'};
 }
 export async function checkBrowserSession(signal:AbortSignal,supplied?:BrowserContext):Promise<SessionStatus>{
- assertServerWaitElapsed();
+ assertAccessWindow();
  const ctx=supplied??await launchBrowser(),page=await ctx.newPage();let restriction:HttpRestriction|undefined;
  page.on('response',r=>{const incoming=responseRestriction(r,'https://www.instagram.com/');if(incoming){const currentWait=Date.parse(restriction?.retry_after_at??'')||0,nextWait=Date.parse(incoming.retry_after_at??'')||0;if(!restriction||nextWait>currentWait||incoming.status===429&&restriction.status!==429&&nextWait>=currentWait)restriction=incoming;}});
  const abort=()=>{void page.close();};signal.addEventListener('abort',abort,{once:true});
