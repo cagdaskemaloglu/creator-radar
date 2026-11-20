@@ -17,8 +17,8 @@ export const profileSchema = z.object({
   discovery_evidence:z.array(z.object({provider:z.string(),keyword:z.string(),search_url:z.string().url(),result_url:z.string().url(),discovered_at:z.string()})).max(20).optional(),
   content_evidence: z.array(z.object({ url: z.string().url(), caption: z.string().max(5000), hashtags: z.array(z.string()), collected_at: z.string().datetime() })).max(6).optional(),
   extraction: z.object({
-    method: z.literal('instagram-visible-page'), warnings: z.array(z.string()), metric_labels: z.record(z.string(), z.string().nullable()),
-    biography_source: z.enum(['visible-profile-bio','meta-description','unavailable']).optional(),
+    method: z.enum(['instagram-visible-page','instagram-graph-api']), warnings: z.array(z.string()), metric_labels: z.record(z.string(), z.string().nullable()),
+    biography_source: z.enum(['visible-profile-bio','meta-description','graph-api','unavailable']).optional(),
     coverage: z.object({ biography: z.enum(['collected','not_available']), post_captions: z.enum(['collected','not_collected','not_available']), hashtags: z.enum(['collected','not_collected','not_available']), comments: z.literal('not_collected') }).optional(),
   }).optional(),
   review_assessment:z.object({status:z.string(),before:z.string(),after:z.string(),attempts:z.number().int().nonnegative(),new_evidence:z.number().int().nonnegative(),resolved:z.boolean(),became_qualified:z.boolean()}).optional(),

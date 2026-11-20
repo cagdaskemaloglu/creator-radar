@@ -22,9 +22,10 @@ import { instagramPostUrl, readInstagramPost, type PostEvidence } from './instag
 import { readResearchState, writeResearchState, pauseInstagram } from './instagram-state';
 import { jsonObject, safeId, first } from './storage/driver';
 import { WorkerInterrupted } from './job-control';
+import { defaultGraphReader, type GraphReader } from './instagram-graph';
 import type { Reader } from './instagram-research';
 export type NightRequest = {enrichmentUrls?:string[];enrichmentMaxPages?:number;selectiveReview?:boolean;discoveryScopeKey?:string;discoveryPriorityKeywords?:string[];discoveryFairBudget?:boolean; efficientResearch?:boolean; target?:import("./taxonomy").ResearchTarget; poolSourceJob?:number; content: string; limit: number; permission: string; nightMaxPages: number; nightMaxPosts: number; nightMaxDepth: number; nightHours: number; discoveryEnabled?:boolean;discoveryTopics?:string[];discoveryKeywords?:string[];discoveryProviders?:DiscoveryProvider[];discoveryMaxQueries?:number;discoveryResultsPerQuery?:number };
-export type NightDependencies = { discovery?:DiscoveryDependencies; profile?: Reader; post?: (url: string, owner: string, signal: AbortSignal) => Promise<PostEvidence | null>; now?: () => number; sleep?: (ms: number, signal: AbortSignal) => Promise<void> };
+export type NightDependencies = { graph?: GraphReader|null; discovery?:DiscoveryDependencies; profile?: Reader; post?: (url: string, owner: string, signal: AbortSignal) => Promise<PostEvidence | null>; now?: () => number; sleep?: (ms: number, signal: AbortSignal) => Promise<void> };
 class NightLimit extends Error { constructor(readonly code: string, readonly terminal: boolean) { super(code); } }
 export async function researchNight(job: number, request: NightRequest, store: CreatorStore, signal: AbortSignal, dependencies: NightDependencies = {}) {
   const night = new NightStore(store);
@@ -34,6 +35,9 @@ export async function researchNight(job: number, request: NightRequest, store: C
   const sleep=(ms:number,s:AbortSignal)=>activity?activity.wait(()=>baseSleep(ms,s)):baseSleep(ms,s);
   const readProfile = dependencies.profile ?? readInstagramProfile, readPost = dependencies.post ?? readInstagramPost;
   const controls = researchLimits(),quarantine=new TechnicalQuarantine(store);
+  // Resmî Graph API yapılandırılmışsa profil okumaları tarayıcı yerine API ile yapılır.
+  const graph = dependencies.graph===undefined ? defaultGraphReader() : dependencies.graph;
+  let graphNotice='';
   const settings: NightSettings = {enrichmentUrls:request.enrichmentUrls,enrichmentMaxPages:request.enrichmentMaxPages, selectiveReview:request.selectiveReview,efficientResearch:request.efficientResearch,target:request.target,maxProfiles: Math.min(request.limit,request.efficientResearch?200:30), maxPages: request.nightMaxPages, maxPosts: request.nightMaxPosts, maxDepth: request.nightMaxDepth, hours: request.nightHours, permission: request.permission, poolSourceJob:request.poolSourceJob,seeds: request.content.trim()?instagramSeeds(request.content):[],discovery:{scopeKey:request.discoveryScopeKey,priorityKeywords:request.discoveryPriorityKeywords,fairBudget:request.discoveryFairBudget,enabled:request.discoveryEnabled??false,topics:request.discoveryTopics??[],keywords:request.discoveryKeywords??[],providers:request.discoveryProviders??['google'],maxQueries:request.discoveryMaxQueries??4,resultsPerQuery:request.discoveryResultsPerQuery??10} };
   await night.initialize(job,settings);
   await night.restore(job);
@@ -136,6 +140,22 @@ export async function researchNight(job: number, request: NightRequest, store: C
             await night.skip(id,recent?'recent_profile_no_visit':'known_profile_discovery_only');await store.log(job,'Known profile skipped before visit; refresh requires enrichment allocation: '+url);continue;
           }
           if(Number(candidate.attempts)>=2) { await night.skip(id,'Interrupted profile retry limit'); continue; }
+          if(graph){
+            const username=new URL(url).pathname.split('/')[1];
+            const viaApi=await graph(username,signal);await active();
+            if(viaApi.status==='loaded'){
+              profile=viaApi.profile;
+              await night.checkpoint(id,JSON.stringify(profile),[]);
+              await night.savePostEvidence(id,viaApi.posts);
+              await store.log(job,`Graph API profili: @${username}; tarayıcı ziyareti yok; ${viaApi.posts.length} gönderi açıklaması`);
+            }else if(viaApi.status==='not_business'){
+              await store.log(job,`Graph API: @${username} işletme/creator hesabı değil veya görünmüyor; tarayıcıyla okunacak`);
+            }else if(graphNotice!==viaApi.reason){
+              graphNotice=viaApi.reason;await store.log(job,`Graph API şu an kullanılamıyor (${viaApi.reason}); profiller tarayıcıyla okunuyor`);
+            }
+          }
+        }
+        if(!profile) {
           await visit(id);
           await store.log(job,'Night profile: '+url);
           const loaded=recovery?await recovery.run(url,()=>readProfile(url,signal),()=>visit(id),active,'profile'):await readProfile(url,signal);consecutiveProfileTransportErrors=0;

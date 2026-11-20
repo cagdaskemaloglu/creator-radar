@@ -8,7 +8,8 @@ Amaç: sistem kısıta takılmadan, daha az ve daha seyrek istekle kesintisiz ç
 - **Faz 2 — 429'da hemen dur (yapıldı):** Aynı adrese yeniden deneme ve başka adrese geçerek deneme kaldırılır. İlk 429'da tur duraklatılır, havuz korunur. 403 ve diğer kapılar aynı kalır.
 - **Faz 3 — Zorunlu soğuma (yapıldı):** HTTP 429 sonrası kademeli soğuma: 72 saat içindeki 1. olayda 24 saat, 2. olayda 48 saat, 3.+ olayda 72 saat. (18 Kasım olayında ~10 saatlik bekleme yetmedi, bu yüzden ilk basamak 24 saattir.) Süre dolmadan Instagram'a istek gönderen hiçbir işlem (tur, devam, oturum kontrolü, manuel pencere) başlayamaz. Panelde açık onayla bilinçli geçersiz kılınabilir; sunucunun bildirdiği bekleme süresi geçersiz kılınamaz.
 - **Faz 4 — Günlük sayfa sınırı ve deney:** `INSTAGRAM_DAILY_PAGES` için sınırlı varsayılan; bir hafta boyunca günlük sayfa, yeni hesap ve 429 sayısı ölçülür. Desteklenmeyen gönderi adreslerinin türleri incelenir; geçerli gönderiler yanlış elenmişse normalleştirme düzeltilir.
-- **Sonra — P2:** Yetkili API/veri sağlayıcı entegrasyonu.
+- **Faz 5 — Resmî Graph API (yapıldı, canlı deneme bekliyor):** Business Discovery ile profil + gönderi açıklaması okuma; tarayıcı yalnız keşif ve API'nin göremediği hesaplar için. Sonraki adım: gerçek token ile bir hafta ölçüm (API ile okunan oran, kayıt başına tarayıcı sayfası, 429 sayısı); tarayıcı soğumadayken bekleyen havuz adaylarını yalnız API ile işleyen tur kipi.
+- **Sonra — P2:** Diğer yetkili veri sağlayıcı entegrasyonları.
 
 ## P0 — Ölçüm ve doğruluk
 1. İnsan değerlendirmeli, kategori/ülke/mağaza türü açısından dengeli bir örneklem oluştur. Model sürümüne göre doğruluk, yanlış pozitif ve belirsizlik oranını ölç.

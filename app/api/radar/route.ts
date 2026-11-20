@@ -1,3 +1,4 @@
+import { graphSummary } from '../../../lib/instagram-graph';
 import {TechnicalQuarantine} from '../../../lib/technical-recovery';
 import {scanStatus,startScan,stopScan} from '../../../lib/continuous-scan';
 import {assertAccessWindow,overrideCooldown,resumeInstagram} from '../../../lib/instagram-state';
@@ -31,7 +32,7 @@ export async function GET(req: NextRequest) {
     const snapshot=await store.snapshot(),runs=await new NightStore(store).reports();
     const selected=req.nextUrl.searchParams.get('log_job_id');const logId=selected?safeId(selected):runs[0]?.job_id;
     const researchLogs=logId?await all(store.database,'SELECT id,job_id,message,created_at FROM logs WHERE job_id=$1 ORDER BY id DESC LIMIT 200',[safeId(logId)]):[];
-    return NextResponse.json({ ...snapshot,technicalQuarantine:{active:await new TechnicalQuarantine(store).summary()},continuousScan:await scanStatus(store),researchLogs,evaluations:await evaluationSummary(store),improvements:{pending:(await improvementQueue(store,[],{})).length},access:await accessSummary(store,readResearchState(),readBrowserSession().checked_at),tagPerformance:await new DiscoveryStore(store).keywordPerformance(),worker:readWorkerStatus(),limits:researchLimits(),defaults:autonomousPlan({}), researchBrowser:{channel:browserPreferences().channel,headless:true,session:readBrowserSession()}, googleDiscovery: readGoogleState(), nightRuns:runs, storage: store.database.dialect, instagram: { ...readResearchState(), enabled: process.env.INSTAGRAM_BROWSER_ENABLED !== 'false' } }, { headers: { 'Cache-Control': 'no-store' } });
+    return NextResponse.json({ ...snapshot,technicalQuarantine:{active:await new TechnicalQuarantine(store).summary()},continuousScan:await scanStatus(store),researchLogs,evaluations:await evaluationSummary(store),improvements:{pending:(await improvementQueue(store,[],{})).length},access:await accessSummary(store,readResearchState(),readBrowserSession().checked_at),tagPerformance:await new DiscoveryStore(store).keywordPerformance(),worker:readWorkerStatus(),limits:researchLimits(),defaults:autonomousPlan({}), researchBrowser:{channel:browserPreferences().channel,headless:true,session:readBrowserSession()}, googleDiscovery: readGoogleState(), graphApi: graphSummary(), nightRuns:runs, storage: store.database.dialect, instagram: { ...readResearchState(), enabled: process.env.INSTAGRAM_BROWSER_ENABLED !== 'false' } }, { headers: { 'Cache-Control': 'no-store' } });
   } catch {
     return NextResponse.json({ error: 'Veritabanına erişilemiyor. Bağlantı ve migration durumunu kontrol et.' }, { status: 503 });
   }

@@ -83,6 +83,13 @@ export class NightStore {
       }
     });
   }
+  // Graph API ile sahibi doğrulanmış gönderi açıklamaları: tarayıcı ziyareti gerekmez.
+  async savePostEvidence(candidate: number, evidence: PostEvidence[]) {
+    if(!evidence.length)return;
+    await this.store.database.transaction(async tx => {
+      for (const post of evidence) await tx.query("INSERT INTO research_posts(candidate_id,url,status,attempts,evidence) VALUES($1,$2,'done',0,$3) ON CONFLICT(candidate_id,url) DO NOTHING", [candidate,post.url,JSON.stringify(post)]);
+    });
+  }
   posts(candidate: number) { return all(this.store.database,'SELECT * FROM research_posts WHERE candidate_id=$1 ORDER BY id',[candidate]); }
   async postResult(post: number, status: 'done'|'skipped'|'blocked', evidence: string | null, reason: string | null) {
     await this.store.database.query('UPDATE research_posts SET status=$1,evidence=$2,reason=$3 WHERE id=$4',[status,evidence,reason,post]);

@@ -22,6 +22,7 @@
     "research:instagram": "node --env-file-if-exists=.env --import tsx scripts/research-instagram.ts",
     "test:instagram-browser": "node --import tsx scripts/test-instagram-browser.ts",
     "research:night": "node --env-file-if-exists=.env --import tsx scripts/research-night.ts",
+    "graph:refresh": "node --env-file-if-exists=.env --import tsx scripts/graph-refresh.ts",
     "test:night-browser": "node --import tsx scripts/test-night-browser.ts",
     "test:discovery-browser": "node --import tsx scripts/test-discovery-browser.ts",
     "test:http-browser": "node --import tsx scripts/test-http-restrictions.ts",
